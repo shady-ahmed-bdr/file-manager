@@ -1,0 +1,47 @@
+<div class="container">
+    <form #settingsForm="ngForm" (ngSubmit)="onSubmit(settingsForm)" novalidate>
+        <div>
+            <label for="downFolderPath">Download Folder Path:</label>
+            <input type="text" id="downFolderPath" name="downFolderPath" [(ngModel)]="settings.downFolderPath"
+                required />
+        </div>
+
+        <div>
+            <label for="rrFolderPath">RR Folder Path:</label>
+            <input type="text" id="rrFolderPath" name="rrFolderPath" [(ngModel)]="settings.rrFolderPath" required />
+        </div>
+
+        <div>
+            <label>
+                <input type="checkbox" name="deleteAfterExtract" [(ngModel)]="settings.deleteAfterExtract" />
+                Delete After Extract
+            </label>
+        </div>
+
+        <div>
+            <label>
+                <input type="checkbox" name="createStlAndDicomWhenTpDone"
+                    [(ngModel)]="settings.createStlAndDicomWhenTpDone" />
+                Create STL and DICOM When TP Done
+            </label>
+        </div>
+        
+        <div>
+            <label>
+                <input type="checkbox" name="checkStlInDicom"
+                    [(ngModel)]="settings.checkStlInDicom" />
+                Check STL in DICOM
+            </label>
+        </div>
+
+        <div>
+            <label>
+                <input type="checkbox" name="createNewPatientFolder"
+                    [(ngModel)]="settings.createNewPatientFolder"  disabled/>
+                Create new Patient folder in server (experimental)
+            </label>
+        </div>
+
+        <button type="submit">Save Settings</button>
+    </form>
+</div>

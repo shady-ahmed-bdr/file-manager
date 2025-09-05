@@ -6,6 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { WSS } from './Backend/web/websocket';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -53,13 +54,19 @@ app.use((req, res, next) => {
  */
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
-  app.listen(port, (error) => {
+  const wsServer =  app.listen(port, (error) => {
     if (error) {
       throw error;
     }
 
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
+  wsServer.on('upgrade', (request, socket, head) => {
+    // You could add auth here
+    WSS.handleUpgrade(request, socket, head, (ws) => {
+      WSS.emit('connection', ws, request);
+  });
+});
 }
 
 /**
