@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import path from 'path';
 import { Patient, SettingsTS } from '../interfaces/websocket';
 import {
   addP,
@@ -8,7 +9,7 @@ import {
 } from '../models/patients';
 import { SETTINGS_CONFIG, saveSettings} from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
-import { startWatching} from '../web/fs-watch';
+import {extractZip, startWatching} from '../web/fs-watch';
 
 
 export const removePatient = (req: Request, res: Response) => {
@@ -22,7 +23,15 @@ export const addPatient = (req: Request, res: Response) => {
   saveSettings(newSettings);
   initNewDir(patient.name)
   .then((data)=>{
-    directSearch({dir:data[0],data:patient.STL_File_LIST},{dir:data[1],data:patient.DICOM})
+    const res = directSearch(patient.STL_File_LIST,patient.DICOM_FILE_LIST)
+    res.foundDICOMs.forEach((filePathToExtract:string)=>{
+      const fileName = path.basename(filePathToExtract);
+      extractZip(filePathToExtract,data[1], 'dicom',fileName)
+    })
+    res.foundDICOMs.forEach((filePathToExtract:string)=>{
+      const fileName = path.basename(filePathToExtract);
+      extractZip(filePathToExtract,data[0], 'stl',fileName) 
+    })
   })
   .catch((err)=>{console.log(err)})
   res.status(201).json({ message: 'Patient added' });
@@ -40,6 +49,7 @@ export const getList = (_req: Request, res: Response) => {
 export const setSettings = (req: Request, res: Response) => {
   const newSettings: SettingsTS = req.body;
   saveSettings(newSettings);
-  console.log(newSettings)
+  startWatching()
   res.json({ message: 'Settings updated' });
 };
+

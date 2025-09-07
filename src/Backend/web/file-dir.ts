@@ -3,7 +3,7 @@ import  { mkdir } from 'fs/promises';
 import path from 'path';
 
 import {SETTINGS_CONFIG} from '../models/settings';
-// import {SettingsTS} from '../interfaces/websocket';
+import { FileState } from '../interfaces/websocket';
 
 
 export const initNewDir=  (patientName:string):Promise<[STL:string,DICOM:string]>=>{
@@ -26,22 +26,22 @@ export const initNewDir=  (patientName:string):Promise<[STL:string,DICOM:string]
     })
 }
 
-export const directSearch = (STLs:{dir:string,data:string[]}, DICOM:{dir:string,data:string[]})=>{
+export const directSearch = (STLs:FileState[], DICOM:FileState[])=>{
     const downFolderPath = SETTINGS_CONFIG.downFolderPath;
     const dir = fs.readdirSync(downFolderPath, { withFileTypes: true });
     const files = dir.filter(entry => entry.isFile()).map(file => file.name);
     const foundSTLs: string[] = [];
     const foundDICOMs: string[] = [];
 
-    for (const filename of STLs.data) {
-        if (files.includes(filename)) {
-        foundSTLs.push(path.join(downFolderPath, filename));
+    for (const filename of STLs) {
+        if (files.includes(filename.name)) {
+            foundSTLs.push(path.join(downFolderPath, filename.name));
         }
     }
     
-    for (const filename of DICOM.data) {
-        if (files.includes(filename)) {
-        foundDICOMs.push(path.join(downFolderPath, filename));
+    for (const filename of DICOM) {
+        if (files.includes(filename.name)) {
+        foundDICOMs.push(path.join(downFolderPath, filename.name));
         }
     }
     return { foundSTLs, foundDICOMs };

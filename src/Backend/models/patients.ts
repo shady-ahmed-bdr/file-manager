@@ -4,11 +4,11 @@ import fs from 'fs'
 export let PATIENT_LIST:Patient[] = [];
 
 export const initPatients = ()=>{
-    if(!fs.existsSync('./patient.json')){
-        fs.writeFileSync('./patient.txt', '')
+    if(!fs.existsSync('./patient.txt')){
+        fs.writeFileSync('./patient.txt', '[]')
     }else{
-        const data = fs.readFileSync('./patient.txt').toString()
-        PATIENT_LIST  = JSON.parse(data) as Patient[]
+        const data = fs.readFileSync('./settings.txt', 'utf-8').trim();
+        PATIENT_LIST = data ? JSON.parse(data) : [];
     }
 }
 initPatients()

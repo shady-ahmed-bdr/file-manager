@@ -43,8 +43,10 @@ function notify(fileType: 'stl' | 'dicom', fileName: string, status: Status) {
 
 
 export const startWatching = () => {
+  console.log('watch mode :...',SETTINGS_CONFIG )
   if(SETTINGS_CONFIG && SETTINGS_CONFIG.downFolderPath){
-    fs.watch(SETTINGS_CONFIG.downFolderPath, { recursive: true }, (eventType, filename) => {
+    console.log(SETTINGS_CONFIG.downFolderPath)
+    fs.watch(SETTINGS_CONFIG.downFolderPath, { recursive: false }, (eventType, filename) => {
       if (filename) {
         console.log(`[${eventType}]`, filename);
       }

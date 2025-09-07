@@ -51,6 +51,7 @@ export class Manager implements OnInit {
     this.api.getList()
     .subscribe((data)=>{
       this.PatientList.update((P)=>{
+        console.log(data)
         return data
       })
     })
