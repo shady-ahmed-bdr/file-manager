@@ -8,7 +8,7 @@ import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 export class Websocket {
   private websocket!:WebSocketSubject<any>;
   constructor(){
-    this.websocket = webSocket('ws://192.168.11.218:4200')
+    this.websocket = webSocket('ws://localhost/:4200')
     this.initSocket();
   }
   initSocket(){

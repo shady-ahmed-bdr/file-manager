@@ -2,8 +2,9 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { FileState, Patient } from '../interfaces/patients';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Api } from '../services/api';
+import { Websocket } from '../services/websocket';
 @Component({
   selector: 'app-manager',
   imports:
@@ -47,24 +48,14 @@ export class Manager implements OnInit {
   }])
 
   ngOnInit(): void {
-    // this.api.getList()
-    // .subscribe((data)=>{
-    //   this.PatientList.update((P)=>{
-    //     return data
-    //   })
-    // })
+    this.api.getList()
+    .subscribe((data)=>{
+      this.PatientList.update((P)=>{
+        return data
+      })
+    })
   }
-  constructor(private api:Api) {
-    // setTimeout(()=>{
-    //   alert('finished')
-    //   this.PatientList.update((list) => {
-    //   const updatedList = [...list]; 
-    //   updatedList[0].DICOM_FILE_LIST[0].zipping='not_found'
-    //   return updatedList;
-    // });
-    // },5000)
-   
-  }
+  constructor(private api:Api, private socket:Websocket) {}
   clear(){
     this.patient.set({
       name: '',
@@ -120,41 +111,54 @@ export class Manager implements OnInit {
  
 
   deletePatient(id:string){
-    console.log(id)
-    this.PatientList.update((PList)=>{
-      return PList.filter((P)=>P.ID != id)
+    this.api.removePatient(id)
+    .subscribe({
+      next:()=>{
+        this.PatientList.update((PList)=>{
+          return PList.filter((P)=>P.ID != id)
+        })
+      },
+      error:()=>{alert('error')}
     })
   }
 
   updateP(p:Patient){
-    this.mode = 'add';
-    this.PatientList.update((P)=>{
-      const patients = P.map((pp)=>{
-        if(pp.ID == p.ID){
-          return p 
-        }else{
-          return pp
-        }
-      })
-      return patients
-    })
-    this.patient.set({
-      name: '',
-      date: { day: this.day, month: this.month },
-      STL_File_LIST: [],
-      DICOM_FILE_LIST: [],
-      extra: [],
-      ID:crypto.randomUUID()
+    this.api.updatePatient(p)
+    .subscribe({
+      next:()=>{
+        this.mode = 'add';
+        this.PatientList.update((P)=>{
+          const patients = P.map((pp)=>{
+            if(pp.ID == p.ID){
+              return p 
+            }else{
+              return pp
+            }
+          })
+          return patients
+        })
+        this.patient.set({
+          name: '',
+          date: { day: this.day, month: this.month },
+          STL_File_LIST: [],
+          DICOM_FILE_LIST: [],
+          extra: [],
+          ID:crypto.randomUUID()
+        })
+      },
+      error:(err)=>{
+        alert('error')
+      }
     })
   }
 
-   onSubmit(form: any) {
-    this.PatientList.update((arr)=>{
-      const newArr = arr;
-      newArr.push(form)
-      return newArr
+  onSubmit(form: NgForm) {
+    console.log(this.patient())
+    this.api.addPatient(this.patient())
+    .subscribe(()=>{
+      this.PatientList.update((arr: Patient[])=>{
+        return [...arr, this.patient()];
+      })
     })
- 
-    console.log('Submitted:', this.patient());
   }
 }

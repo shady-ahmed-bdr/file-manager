@@ -1,6 +1,7 @@
 import { Component,OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { SettingsTS } from '../interfaces/patients';
+import { Api } from '../services/api';
 @Component({
   selector: 'app-settings',
   imports: [FormsModule],
@@ -17,7 +18,7 @@ export class Settings implements OnInit {
     createNewPatientFolder:false
   };
   private readonly localStorageKey = 'appSettings';
-
+  constructor(private api:Api){}
   ngOnInit() {
     const savedSettings = localStorage.getItem(this.localStorageKey);
     if (savedSettings) {
@@ -26,9 +27,18 @@ export class Settings implements OnInit {
   }
   onSubmit(form: NgForm) {
     if (form.valid) {
-      localStorage.setItem(this.localStorageKey,JSON.stringify(this.settings))
       console.log('Form Submitted:', this.settings);
+      localStorage.setItem(this.localStorageKey,JSON.stringify(this.settings))
       // handle settings saving logic here
+      this.api.setSettings()
+      .subscribe({
+        next: (response) => {
+          alert('Settings saved successfully!');
+        },
+        error: (error) => { console.error('Error saving settings:', error); }
+      }) 
+    }else{
+      alert('Please fill in all required fields correctly.');
     }
   }
 }

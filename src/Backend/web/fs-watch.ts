@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import unzipper from 'unzipper';
 import { sendToClient } from '../web/websocket';
+import { SETTINGS_CONFIG } from '../models/settings';
+
 
 type Status = 'pending' | 'finished' | 'not_found';
 
@@ -35,4 +37,17 @@ function notify(fileType: 'stl' | 'dicom', fileName: string, status: Status) {
     type: 'file_status',
     payload: { fileType, fileName, status },
   });
+}
+
+
+
+
+export const startWatching = () => {
+  if(SETTINGS_CONFIG && SETTINGS_CONFIG.downFolderPath){
+    fs.watch(SETTINGS_CONFIG.downFolderPath, { recursive: true }, (eventType, filename) => {
+      if (filename) {
+        console.log(`[${eventType}]`, filename);
+      }
+    });
+  }
 }

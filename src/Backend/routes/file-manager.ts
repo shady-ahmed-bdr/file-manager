@@ -7,12 +7,11 @@ import {
   setSettings,
 } from '../controllers/patientController';
 
-const router = Router();
+export const router = Router();
 
 router.delete('/remove/:id', removePatient);
 router.post('/add', addPatient);
 router.patch('/update', updatePatient);
 router.get('/list', getList);
-router.post('/settigs', setSettings); // NOTE: 'settigs' as per your original typo
+router.post('/settings', setSettings); 
 
-export default router;

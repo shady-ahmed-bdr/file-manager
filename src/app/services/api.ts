@@ -12,7 +12,6 @@ export class Api {
     const data = localStorage.getItem('appSettings')
     if(data != undefined){
       this.settings = JSON.parse(data);
-      // this.setSettings()
     } 
   }
   removePatient(id:string):Observable<boolean>{
@@ -28,7 +27,7 @@ export class Api {
     return this.http.get<Patient[]>('/list')
   }
   setSettings(){
-    return this.http.post('/settigs',this.settings)
+    return this.http.post('/settings',this.settings)
   }
 }
 
