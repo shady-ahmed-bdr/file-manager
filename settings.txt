@@ -1,0 +1,8 @@
+{
+  "downFolderPath": "C:\\Users\\shady\\Downloads",
+  "rrFolderPath": "D:\\RR",
+  "deleteAfterExtract": false,
+  "createStlAndDicomWhenTpDone": false,
+  "checkStlInDicom": false,
+  "createNewPatientFolder": false
+}

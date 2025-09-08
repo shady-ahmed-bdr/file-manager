@@ -1,4 +1,4 @@
-import { Patient } from "../interfaces/websocket";
+import { FileState, Patient } from "../interfaces/websocket";
 import fs from 'fs'
 
 export let PATIENT_LIST:Patient[] = [];
@@ -7,7 +7,7 @@ export const initPatients = ()=>{
     if(!fs.existsSync('./patient.txt')){
         fs.writeFileSync('./patient.txt', '[]')
     }else{
-        const data = fs.readFileSync('./settings.txt', 'utf-8').trim();
+        const data = fs.readFileSync('./patient.txt', 'utf-8').trim();
         PATIENT_LIST = data ? JSON.parse(data) : [];
     }
 }
@@ -38,6 +38,23 @@ export const updateP = (patient:Patient)=>{
     PATIENT_LIST.map((p)=>{
         if(p.ID = patient.ID){
             return patient
+        }
+        return p
+    })
+    savePatients()
+}
+
+
+export const  updateStateOfPatientFiles = (id:string,loc:'STL_File_LIST'|'DICOM_FILE_LIST'|'extra',fileName:string,state:FileState['zipping'])=> {
+    PATIENT_LIST.map((p)=>{
+        if(p.ID == id){
+            p[loc]?.map((str)=>{
+                if(fileName == str.name){
+                    str.zipping = state;
+                    return str
+                }
+                return str
+            })
         }
         return p
     })

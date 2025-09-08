@@ -24,7 +24,7 @@
             @for (file of patient().STL_File_LIST; track $index) {
                 <div class="file-entry">
                     <input [(ngModel)]="file.name" name="stl-name-{{ $index }}" placeholder="File Name" />
-                    <select [(ngModel)]="file.zipping" name="stl-zip-{{ $index }}">
+                    <select disabled [(ngModel)]="file.zipping" name="stl-zip-{{ $index }}">
                         <option value="not_found">Not Found</option>
                         <option value="pending">Pending</option>
                         <option value="finished">Finished</option>
@@ -43,7 +43,7 @@
             @for (file of patient().DICOM_FILE_LIST; track $index) {
             <div class="file-entry">
                 <input [(ngModel)]="file.name" name="dicom-name-{{ $index }}" placeholder="File Name" />
-                <select [(ngModel)]="file.zipping" name="dicom-zip-{{ $index }}">
+                <select disabled [(ngModel)]="file.zipping" name="dicom-zip-{{ $index }}">
                     <option value="not_found">Not Found</option>
                     <option value="pending">Pending</option>
                     <option value="finished">Finished</option>
