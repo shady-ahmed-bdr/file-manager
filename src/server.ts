@@ -55,7 +55,6 @@ if (isMainModule(import.meta.url)) {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
   wsServer.on('upgrade', (request, socket, head) => {
-    // You could add auth here
     WSS.handleUpgrade(request, socket, head, (ws) => {
       WSS.emit('connection', ws, request);
   });

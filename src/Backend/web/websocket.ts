@@ -11,7 +11,8 @@ WSS.on('connection', (ws, request) => {
     clientSocket = ws
     ws.on('message', (message) => {
         console.log('Received:', message.toString());
-        ws.send(`Echo: ${message}`);
+        const msg = JSON.parse(message.toString());
+        ws.send(JSON.stringify({ echo: msg }));
     });
 
     ws.on('close', () => {

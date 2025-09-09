@@ -36,7 +36,7 @@ export const  removeP =(id:string) =>{
 
 export const updateP = (patient:Patient)=>{
     PATIENT_LIST.map((p)=>{
-        if(p.ID = patient.ID){
+        if(p.ID == patient.ID){
             return patient
         }
         return p

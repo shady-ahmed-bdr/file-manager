@@ -15,7 +15,7 @@ export class Api {
     } 
   }
   removePatient(id:string):Observable<boolean>{
-    return this.http.delete<boolean>('/remove'+id)
+    return this.http.delete<boolean>('/remove/'+id)
   }
   addPatient(patient:Patient){
     return this.http.post('/add',{patient,settings:this.settings})
@@ -26,8 +26,9 @@ export class Api {
   getList():Observable<Patient[]>{
     return this.http.get<Patient[]>('/list')
   }
-  setSettings(){
-    return this.http.post('/settings',this.settings)
+  setSettings(newSettings:any){
+    console.log(this.settings)
+    return this.http.post('/settings',{newSettings})
   }
 }
 

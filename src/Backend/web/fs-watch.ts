@@ -8,9 +8,6 @@ type Status = 'pending' | 'finished' | 'not_found';
 
 
 
-
-
-
 export async function extractZip(
   filePath: string,
   destDir: string,
@@ -54,7 +51,7 @@ export const copyFile = (src:string, dest:string,fileName:string,fileType: 'STL_
   try{
     notify(fileType, fileName, 'pending',id);
     updateStateOfPatientFiles(id,fileType,fileName,'pending')
-    fs.copyFileSync(src, destDir, constants.COPYFILE_EXCL)
+    fs.copyFileSync(src, dest, constants.COPYFILE_EXCL)
     notify(fileType, fileName, 'finished',id);
     updateStateOfPatientFiles(id,fileType,fileName,'finished')
   }catch(err){
@@ -62,46 +59,50 @@ export const copyFile = (src:string, dest:string,fileName:string,fileType: 'STL_
   }
 }
 
-
-
-
 export const startWatching = () => {
-  if(SETTINGS_CONFIG && SETTINGS_CONFIG.downFolderPath){
-    console.log(SETTINGS_CONFIG.downFolderPath)
-    fs.watch(SETTINGS_CONFIG.downFolderPath, { recursive: false }, (eventType, filename) => {
-      if (filename) {
+  if (SETTINGS_CONFIG && SETTINGS_CONFIG.downFolderPath) {
+    console.log(SETTINGS_CONFIG.downFolderPath);
+
+    fs.watch(
+      SETTINGS_CONFIG.downFolderPath,
+      { recursive: false },
+      (eventType, filename) => {
+        if (!filename) return;
+
         console.log(`[${eventType}]`, filename);
-        PATIENT_LIST.forEach(P=>{
-          const D_index = P.DICOM_FILE_LIST.findIndex(f=>f.name == filename)
-          if(D_index!= -1){
-            const file = P.DICOM_FILE_LIST[D_index].name
-            const fileP = path.join(SETTINGS_CONFIG.downFolderPath,file)
-            const destFileDicom = path.join(SETTINGS_CONFIG.rrFolderPath,P.name,'OLD','DICOM')
-            if(file.endsWith('.zip')){
-              extractZip(fileP,destFileDicom,'DICOM_FILE_LIST',file,P.ID)
-            }else{
-              copyFile(fileP,destFileDicom,file,'DICOM_FILE_LIST',P.ID)
+
+        PATIENT_LIST.forEach((P) => {
+          // ---- DICOM ----
+          const D_index = P.DICOM_FILE_LIST.findIndex(f => f.name === filename);
+          if (D_index !== -1) {
+            const fileObj = P.DICOM_FILE_LIST[D_index];
+            if (fileObj.zipping === 'not_found') {
+              const fileP = path.join(SETTINGS_CONFIG.downFolderPath, fileObj.name);
+              const destFileDicom = path.join(SETTINGS_CONFIG.rrFolderPath, P.name, 'OLD', 'DICOM');
+              if (fileObj.name.endsWith('.zip')) {
+                extractZip(fileP, destFileDicom, 'DICOM_FILE_LIST', fileObj.name, P.ID);
+              } else {
+                copyFile(fileP, destFileDicom, fileObj.name, 'DICOM_FILE_LIST', P.ID);
+              }
             }
           }
-          const S_index = P.STL_File_LIST.findIndex(f=>f.name == filename)
-          if(S_index!= -1){
-            const file = P.STL_File_LIST[D_index].name
-            const fileP = path.join(SETTINGS_CONFIG.downFolderPath,file)
-            const destFileDicom = path.join(SETTINGS_CONFIG.rrFolderPath,P.name,'OLD','STL')
-            if(file.endsWith('.zip')){
-              extractZip(fileP,destFileDicom,'STL_File_LIST',file,P.ID)
-            }else{
-              copyFile(fileP,destFileDicom,file,'STL_File_LIST',P.ID)
+
+          // ---- STL ----
+          const S_index = P.STL_File_LIST.findIndex(f => f.name === filename);
+          if (S_index !== -1) {
+            const fileObj = P.STL_File_LIST[S_index];
+            if (fileObj.zipping === 'not_found') {
+              const fileP = path.join(SETTINGS_CONFIG.downFolderPath, fileObj.name);
+              const destFileStl = path.join(SETTINGS_CONFIG.rrFolderPath, P.name, 'OLD', 'STL');
+              if (fileObj.name.endsWith('.zip')) {
+                extractZip(fileP, destFileStl, 'STL_File_LIST', fileObj.name, P.ID);
+              } else {
+                copyFile(fileP, destFileStl, fileObj.name, 'STL_File_LIST', P.ID);
+              }
             }
           }
-          const E_index = P.extra?.findIndex(f=>f.name == filename)
-          if(S_index!= -1){
-            const file = P.extra![E_index!].name
-            const destFileDicom = path.join(SETTINGS_CONFIG.rrFolderPath,P.name,'OLD', P.extra![E_index!].target)
-            copyFile(file,destFileDicom,file,'extra',P.ID)
-          }
-        })
+        });
       }
-    });
+    );
   }
-}
+};

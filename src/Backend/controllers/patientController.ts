@@ -7,51 +7,134 @@ import {
   updateP,
   PATIENT_LIST
 } from '../models/patients';
-import { SETTINGS_CONFIG, saveSettings} from '../models/settings';
+import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
-import {copyFile, extractZip, startWatching} from '../web/fs-watch';
+import { copyFile, extractZip, startWatching } from '../web/fs-watch';
 
 
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
   removeP(id);
+  res.end()
 };
 
 export const addPatient = (req: Request, res: Response) => {
   const { patient, settings: newSettings }: { patient: Patient; settings: SettingsTS } = req.body;
+  patient.name = patient.name.trim()
   addP(patient)
   saveSettings(newSettings);
   initNewDir(patient.name)
-  .then((data)=>{
-    const res = directSearch(patient.STL_File_LIST,patient.DICOM_FILE_LIST)
-    res.foundDICOMs.forEach((filePathToExtract:string)=>{
-      const fileName = path.basename(filePathToExtract);
-      if(fileName.endsWith('.zip')){
-        extractZip(filePathToExtract,data[1], 'DICOM_FILE_LIST',fileName,patient.ID)
-      }else{
-        copyFile(filePathToExtract,data[1],fileName, 'DICOM_FILE_LIST',patient.ID)
-      }
+    .then((data) => {
+      const res = directSearch(patient.STL_File_LIST, patient.DICOM_FILE_LIST)
+      res.foundDICOMs.forEach((filePathToExtract: string) => {
+        const fileName = path.basename(filePathToExtract);
+        if (fileName.endsWith('.zip')) {
+          extractZip(filePathToExtract, data[1], 'DICOM_FILE_LIST', fileName, patient.ID)
+        } else {
+          copyFile(filePathToExtract, data[1], fileName, 'DICOM_FILE_LIST', patient.ID)
+        }
+      })
+      res.foundSTLs.forEach((filePathToExtract: string) => {
+        const fileName = path.basename(filePathToExtract);
+        if (fileName.endsWith('.zip')) {
+          extractZip(filePathToExtract, data[0], 'STL_File_LIST', fileName, patient.ID)
+        } else {
+          copyFile(filePathToExtract, data[0], fileName, 'STL_File_LIST', patient.ID)
+        }
+      })
+      patient.extra?.forEach((extraFile) => {
+        const baseNameFromPath = path.basename(extraFile.name);
+        const destPathExtra = path.join(
+          SETTINGS_CONFIG.rrFolderPath,
+          patient.name,
+          'OLD',
+          extraFile.target.toUpperCase() // 'stl' → 'STL', 'dicom' → 'DICOM'
+        );
+        if (extraFile.name.endsWith('.zip')) {
+          extractZip(extraFile.name, destPathExtra, 'extra', baseNameFromPath, patient.ID);
+        } else {
+          copyFile(extraFile.name, destPathExtra, baseNameFromPath, 'extra', patient.ID);
+        }
+      });
     })
-    res.foundDICOMs.forEach((filePathToExtract:string)=>{
-      const fileName = path.basename(filePathToExtract);
-      if(fileName.endsWith('.zip')){
-        extractZip(filePathToExtract,data[0], 'STL_File_LIST',fileName,patient.ID) 
-      }else{
-        copyFile(filePathToExtract,data[1],fileName, 'STL_File_LIST',patient.ID)
-      }
-    })
-    patient.extra?.forEach((filePath)=>{
-      const baseNameFromPath = path.basename(filePath.name)
-      copyFile(filePath.name,data[1],baseNameFromPath, 'STL_File_LIST',patient.ID)
-    })
-  })
-  .catch((err)=>{console.log(err)})
+    .catch((err) => { console.log(err) })
   res.status(201).json({ message: 'Patient added' });
 };
 
+
+
+
 export const updatePatient = (req: Request, res: Response) => {
   const { patient, settings: newSettings }: { patient: Patient; settings: SettingsTS } = req.body;
+  patient.name = patient.name.trim()
   updateP(patient)
+  try {
+    const resSearch = directSearch(patient.STL_File_LIST, patient.DICOM_FILE_LIST);
+    
+    // --- DICOM files ---
+    patient.DICOM_FILE_LIST
+      .filter((f) => f.zipping === 'not_found')
+      .forEach((f) => {
+        const destPathExtra = path.join(
+          SETTINGS_CONFIG.rrFolderPath,
+          patient.name,
+          'OLD',
+          'DICOM' // 'stl' → 'STL', 'dicom' → 'DICOM'
+        );
+        const filePath = resSearch.foundDICOMs.find((p) => path.basename(p) === f.name);
+        if (!filePath) return;
+
+        if (filePath.endsWith('.zip')) {
+          extractZip(filePath, newSettings.rrFolderPath, 'DICOM_FILE_LIST', f.name, patient.ID);
+        } else {
+          copyFile(filePath, newSettings.rrFolderPath, f.name, 'DICOM_FILE_LIST', patient.ID);
+        }
+      });
+
+    // --- STL files ---
+    patient.STL_File_LIST
+      .filter((f) => f.zipping === 'not_found')
+      .forEach((f) => {
+        const destPathExtra = path.join(
+          SETTINGS_CONFIG.rrFolderPath,
+          patient.name,
+          'OLD',
+          'STL' // 'stl' → 'STL', 'dicom' → 'DICOM'
+        );
+        const filePath = resSearch.foundSTLs.find((p) => path.basename(p) === f.name);
+        if (!filePath) return;
+
+        if (filePath.endsWith('.zip')) {
+          extractZip(filePath, newSettings.rrFolderPath, 'STL_File_LIST', f.name, patient.ID);
+        } else {
+          copyFile(filePath, newSettings.rrFolderPath, f.name, 'STL_File_LIST', patient.ID);
+        }
+      });
+
+    // --- Extra files ---
+    patient.extra
+      ?.filter((f) => f.zipping === 'not_found')
+      .forEach((f) => {
+        const destPathExtra = path.join(
+          SETTINGS_CONFIG.rrFolderPath,
+          patient.name,
+          'OLD',
+          f.target.toUpperCase() // 'stl' → 'STL', 'dicom' → 'DICOM'
+        );
+        const targetType = f.target === 'stl' ? 'STL_File_LIST' : 'DICOM_FILE_LIST';
+        if (f.name.endsWith('.zip')) {
+          extractZip(f.name, newSettings.rrFolderPath, 'STL_File_LIST', f.name, patient.ID);
+        } else {
+          const baseName = path.basename(f.name)
+          copyFile(f.name, newSettings.rrFolderPath, baseName, 'STL_File_LIST', patient.ID);
+        }
+      });
+
+    res.status(200).json({ message: 'Patient updated' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error updating patient' });
+  }
 };
 
 export const getList = (_req: Request, res: Response) => {
@@ -59,7 +142,8 @@ export const getList = (_req: Request, res: Response) => {
 };
 
 export const setSettings = (req: Request, res: Response) => {
-  const newSettings: SettingsTS = req.body;
+  const {newSettings} = req.body;
+  console.log(newSettings, 'post')
   saveSettings(newSettings);
   res.json({ message: 'Settings updated' });
 };

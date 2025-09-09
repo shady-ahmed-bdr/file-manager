@@ -30,7 +30,7 @@ export class Settings implements OnInit {
       console.log('Form Submitted:', this.settings);
       localStorage.setItem(this.localStorageKey,JSON.stringify(this.settings))
       // handle settings saving logic here
-      this.api.setSettings()
+      this.api.setSettings(this.settings)
       .subscribe({
         next: (response) => {
           alert('Settings saved successfully!');

@@ -17,6 +17,7 @@ initSettings()
 
 export const saveSettings = (data:SettingsTS)=>{
     try{
+        console.log(data, 'saved')
         SETTINGS_CONFIG = data;
         fs.writeFileSync('./settings.txt', JSON.stringify(data, null, 2))
     }catch(err){

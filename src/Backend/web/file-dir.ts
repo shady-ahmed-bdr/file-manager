@@ -8,7 +8,7 @@ import { FileState } from '../interfaces/websocket';
 
 export const initNewDir=  (patientName:string):Promise<[STL:string,DICOM:string]>=>{
     return new Promise((res,rej)=>{
-        const patientDir = path.join(SETTINGS_CONFIG.rrFolderPath, patientName);
+        const patientDir = path.join(SETTINGS_CONFIG.rrFolderPath, patientName.trim());
         const OLD = path.join(patientDir, 'OLD');
         const STL = path.join(OLD, 'STL');
         const DICOM = path.join(OLD, 'DICOM');
@@ -41,7 +41,7 @@ export const directSearch = (STLs:FileState[], DICOM:FileState[])=>{
     
     for (const filename of DICOM) {
         if (files.includes(filename.name)) {
-        foundDICOMs.push(path.join(downFolderPath, filename.name));
+            foundDICOMs.push(path.join(downFolderPath, filename.name));
         }
     }
     return { foundSTLs, foundDICOMs };
