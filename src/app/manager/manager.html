@@ -86,7 +86,7 @@
         @for(patient of PatientList(); track $index){
         <div class="patient">
             <div class="patient_meta">
-                <h1>{{patient.name}}</h1>
+                <h1>{{patient.name}} <mat-icon (click)="copy(api.settings.rrFolderPath+'\\'+patient.name)">content_copy</mat-icon> </h1>
                 <p>{{patient?.date?.day + '/' + patient?.date?.month}}</p>
             </div>
             <div class="patient_action">

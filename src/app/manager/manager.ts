@@ -16,6 +16,7 @@ import { Websocket } from '../services/websocket';
   styleUrl: './manager.scss'
 })
 export class Manager implements OnInit {
+  rr:string =''
   date: Date = new Date()
   month = String(this.date.getMonth() + 1).padStart(2, '0')
   day = String(this.date.getDate()).padStart(2, '0');
@@ -48,6 +49,7 @@ export class Manager implements OnInit {
         );
       }
     });
+
   }
   constructor(private api: Api, private socket: Websocket) { }
   clear() {

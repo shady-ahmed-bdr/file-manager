@@ -11,11 +11,9 @@ import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
 import { copyFile, extractZip  } from '../web/fs-watch';
 
-
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
   removeP(id);
-  
   res.end()
 };
 

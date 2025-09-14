@@ -1,24 +1,34 @@
 [
   {
-    "name": "mohamed",
+    "name": "Shady Ahmed",
     "date": {
-      "day": "14",
+      "day": "15",
       "month": "09"
     },
-    "STL_File_LIST": [],
-    "DICOM_FILE_LIST": [],
-    "extra": [
+    "STL_File_LIST": [
       {
-        "name": "E:\\toSend\\02ef8f31ea86a45cfce6eb297c274598.zip",
-        "zipping": "finished",
-        "target": "stl"
-      },
-      {
-        "name": "E:\\toSend\\9ab20df7b89dd84716029b777ed7a5b2.zip",
-        "zipping": "finished",
-        "target": "dicom"
+        "name": "stl.zip",
+        "zipping": "finished"
       }
     ],
-    "ID": "8d1e1e00-4bfe-45fa-b86f-2b3465786809"
+    "DICOM_FILE_LIST": [
+      {
+        "name": "dicom.zip",
+        "zipping": "finished"
+      }
+    ],
+    "extra": [
+      {
+        "name": "C:\\Users\\shady\\Downloads\\data.zip",
+        "zipping": "finished",
+        "target": "dicom"
+      },
+      {
+        "name": "C:\\Users\\shady\\Downloads\\data.zip",
+        "zipping": "finished",
+        "target": "stl"
+      }
+    ],
+    "ID": "6e54c848-e01d-4b5a-b2a4-9d22e9cf21dc"
   }
 ]
