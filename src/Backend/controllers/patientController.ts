@@ -35,6 +35,7 @@ export const addPatient = (req: Request, res: Response) => {
         const fileName = path.basename(filePathToExtract);
         if (fileName.endsWith('.zip')) {
           extractZip(filePathToExtract, data[1], 'DICOM_FILE_LIST', fileName, patient.ID)
+          copyFile(filePathToExtract, data[1], fileName, 'DICOM_FILE_LIST', patient.ID)
         } else {
           copyFile(filePathToExtract, data[1], fileName, 'DICOM_FILE_LIST', patient.ID)
         }
@@ -43,6 +44,7 @@ export const addPatient = (req: Request, res: Response) => {
         const fileName = path.basename(filePathToExtract);
         if (fileName.endsWith('.zip')) {
           extractZip(filePathToExtract, data[0], 'STL_File_LIST', fileName, patient.ID)
+          copyFile(filePathToExtract, data[0], fileName, 'STL_File_LIST', patient.ID)
         } else {
           copyFile(filePathToExtract, data[0], fileName, 'STL_File_LIST', patient.ID)
         }
@@ -57,6 +59,7 @@ export const addPatient = (req: Request, res: Response) => {
         );
         if (extraFile.name.endsWith('.zip')) {
           extractZip(extraFile.name, destPathExtra, 'extra', baseNameFromPath, patient.ID);
+          copyFile(extraFile.name, destPathExtra, baseNameFromPath, 'extra', patient.ID);
         } else {
           copyFile(extraFile.name, destPathExtra, baseNameFromPath, 'extra', patient.ID);
         }
@@ -71,6 +74,7 @@ export const addPatient = (req: Request, res: Response) => {
 
 export const updatePatient = (req: Request, res: Response) => {
   const { patient, settings: newSettings }: { patient: Patient; settings: SettingsTS } = req.body;
+  console.log(patient)
   patient.name = patient.name.trim()
   patient.extra = patient.extra?.map((ePath)=> {
     ePath.name = ePath.name.replace(/^"(.*)"$/, "$1")
@@ -94,6 +98,7 @@ export const updatePatient = (req: Request, res: Response) => {
 
         if (filePath.endsWith('.zip')) {
           extractZip(filePath, destPathExtra, 'DICOM_FILE_LIST', f.name, patient.ID);
+          copyFile(filePath, destPathExtra, f.name, 'DICOM_FILE_LIST', patient.ID);
         } else {
           copyFile(filePath, destPathExtra, f.name, 'DICOM_FILE_LIST', patient.ID);
         }
@@ -114,6 +119,7 @@ export const updatePatient = (req: Request, res: Response) => {
 
         if (filePath.endsWith('.zip')) {
           extractZip(filePath, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
+          copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
         } else {
           copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
         }
@@ -129,10 +135,11 @@ export const updatePatient = (req: Request, res: Response) => {
           'OLD',
           f.target.toUpperCase() // 'stl' → 'STL', 'dicom' → 'DICOM'
         );
+        const baseName = path.basename(f.name)
         if (f.name.endsWith('.zip')) {
           extractZip(f.name, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
+          copyFile(f.name, destPathExtra, baseName, 'STL_File_LIST', patient.ID);
         } else {
-          const baseName = path.basename(f.name)
           copyFile(f.name, destPathExtra, baseName, 'STL_File_LIST', patient.ID);
         }
       });

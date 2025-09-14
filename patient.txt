@@ -1,23 +1,24 @@
 [
   {
-    "name": "asdc",
+    "name": "mohamed",
     "date": {
-      "day": "11",
+      "day": "14",
       "month": "09"
     },
-    "STL_File_LIST": [
+    "STL_File_LIST": [],
+    "DICOM_FILE_LIST": [],
+    "extra": [
       {
-        "name": "stl.zip",
-        "zipping": "finished"
+        "name": "E:\\toSend\\02ef8f31ea86a45cfce6eb297c274598.zip",
+        "zipping": "finished",
+        "target": "stl"
+      },
+      {
+        "name": "E:\\toSend\\9ab20df7b89dd84716029b777ed7a5b2.zip",
+        "zipping": "finished",
+        "target": "dicom"
       }
     ],
-    "DICOM_FILE_LIST": [
-      {
-        "name": "stl.zip",
-        "zipping": "finished"
-      }
-    ],
-    "extra": [],
-    "ID": "759d902f-3631-4ab7-8e55-6a96f41d6281"
+    "ID": "8d1e1e00-4bfe-45fa-b86f-2b3465786809"
   }
 ]
