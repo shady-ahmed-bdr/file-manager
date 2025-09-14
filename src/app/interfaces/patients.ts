@@ -18,6 +18,7 @@ export interface SettingsTS {
     createStlAndDicomWhenTpDone:boolean;
     checkStlInDicom:boolean;
     createNewPatientFolder:Boolean;
+    deletePatientFolderInRR:boolean
 }
 
 export interface FileState {

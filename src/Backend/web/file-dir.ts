@@ -6,24 +6,21 @@ import {SETTINGS_CONFIG} from '../models/settings';
 import { FileState } from '../interfaces/websocket';
 
 
-export const initNewDir=  (patientName:string):Promise<[STL:string,DICOM:string]>=>{
-    return new Promise((res,rej)=>{
+export const initNewDir= async  (patientName:string):Promise<[STL: string, DICOM: string]>=>{
         const patientDir = path.join(SETTINGS_CONFIG.rrFolderPath, patientName.trim());
         const OLD = path.join(patientDir, 'OLD');
         const STL = path.join(OLD, 'STL');
         const DICOM = path.join(OLD, 'DICOM');
         if (!fs.existsSync(patientDir)) {
-            try {
-                mkdir(STL, { recursive: true });
-                mkdir(DICOM, { recursive: true });
-                res([STL,DICOM])
-                console.log(`Folder created at: ${patientDir}`);
-            } catch (err) {
-                console.error("Error creating folder:", err);
-                rej(err)
-            }
+            await mkdir(patientDir, { recursive: true })
+            await mkdir(OLD, { recursive: true })
+            await mkdir(STL, { recursive: true });
+            await mkdir(DICOM, { recursive: true });
+            console.log(`Folder created at: ${patientDir}`);
+            return [STL,DICOM]
         }
-    })
+    return [STL,DICOM]
+
 }
 
 export const directSearch = (STLs:FileState[], DICOM:FileState[])=>{

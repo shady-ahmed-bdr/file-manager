@@ -1,34 +1,23 @@
 [
   {
-    "name": "mohamed nagy",
+    "name": "asdc",
     "date": {
-      "day": "09",
+      "day": "11",
       "month": "09"
     },
     "STL_File_LIST": [
       {
-        "name": "02ef8f31ea86a45cfce6eb297c274598.zip",
+        "name": "stl.zip",
         "zipping": "finished"
       }
     ],
     "DICOM_FILE_LIST": [
       {
-        "name": "02ef8f31ea86a45cfce6eb297c274598.zip",
+        "name": "stl.zip",
         "zipping": "finished"
       }
     ],
-    "extra": [
-      {
-        "name": "\"D:\\gmaes\\111.jfif\"",
-        "zipping": "not_found",
-        "target": "stl"
-      },
-      {
-        "name": "D:\\gmaes\\111.jfif",
-        "zipping": "not_found",
-        "target": "dicom"
-      }
-    ],
-    "ID": "b75d1416-8509-4b2e-84f7-360cdbb3f007"
+    "extra": [],
+    "ID": "759d902f-3631-4ab7-8e55-6a96f41d6281"
   }
 ]

@@ -9,18 +9,23 @@ import {
 } from '../models/patients';
 import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
-import { copyFile, extractZip, startWatching } from '../web/fs-watch';
+import { copyFile, extractZip  } from '../web/fs-watch';
 
 
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
   removeP(id);
+  
   res.end()
 };
 
 export const addPatient = (req: Request, res: Response) => {
   const { patient, settings: newSettings }: { patient: Patient; settings: SettingsTS } = req.body;
   patient.name = patient.name.trim()
+  patient.extra = patient.extra?.map((ePath)=> {
+    ePath.name = ePath.name.replace(/^"(.*)"$/, "$1")
+    return ePath
+  }) 
   addP(patient)
   saveSettings(newSettings);
   initNewDir(patient.name)
@@ -67,10 +72,13 @@ export const addPatient = (req: Request, res: Response) => {
 export const updatePatient = (req: Request, res: Response) => {
   const { patient, settings: newSettings }: { patient: Patient; settings: SettingsTS } = req.body;
   patient.name = patient.name.trim()
+  patient.extra = patient.extra?.map((ePath)=> {
+    ePath.name = ePath.name.replace(/^"(.*)"$/, "$1")
+    return ePath
+  })
   updateP(patient)
   try {
     const resSearch = directSearch(patient.STL_File_LIST, patient.DICOM_FILE_LIST);
-    
     // --- DICOM files ---
     patient.DICOM_FILE_LIST
       .filter((f) => f.zipping === 'not_found')
@@ -85,9 +93,9 @@ export const updatePatient = (req: Request, res: Response) => {
         if (!filePath) return;
 
         if (filePath.endsWith('.zip')) {
-          extractZip(filePath, newSettings.rrFolderPath, 'DICOM_FILE_LIST', f.name, patient.ID);
+          extractZip(filePath, destPathExtra, 'DICOM_FILE_LIST', f.name, patient.ID);
         } else {
-          copyFile(filePath, newSettings.rrFolderPath, f.name, 'DICOM_FILE_LIST', patient.ID);
+          copyFile(filePath, destPathExtra, f.name, 'DICOM_FILE_LIST', patient.ID);
         }
       });
 
@@ -105,9 +113,9 @@ export const updatePatient = (req: Request, res: Response) => {
         if (!filePath) return;
 
         if (filePath.endsWith('.zip')) {
-          extractZip(filePath, newSettings.rrFolderPath, 'STL_File_LIST', f.name, patient.ID);
+          extractZip(filePath, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
         } else {
-          copyFile(filePath, newSettings.rrFolderPath, f.name, 'STL_File_LIST', patient.ID);
+          copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
         }
       });
 
@@ -121,12 +129,11 @@ export const updatePatient = (req: Request, res: Response) => {
           'OLD',
           f.target.toUpperCase() // 'stl' → 'STL', 'dicom' → 'DICOM'
         );
-        const targetType = f.target === 'stl' ? 'STL_File_LIST' : 'DICOM_FILE_LIST';
         if (f.name.endsWith('.zip')) {
-          extractZip(f.name, newSettings.rrFolderPath, 'STL_File_LIST', f.name, patient.ID);
+          extractZip(f.name, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
         } else {
           const baseName = path.basename(f.name)
-          copyFile(f.name, newSettings.rrFolderPath, baseName, 'STL_File_LIST', patient.ID);
+          copyFile(f.name, destPathExtra, baseName, 'STL_File_LIST', patient.ID);
         }
       });
 

@@ -1,4 +1,4 @@
-import fs, {constants } from 'fs';
+import fs, {constants,mkdir, mkdirSync } from 'fs';
 import path from 'path';
 import unzipper from 'unzipper';
 import { sendToClient } from '../web/websocket';
@@ -44,16 +44,33 @@ function notify(fileType: 'STL_File_LIST'|'DICOM_FILE_LIST'|'extra', fileName: s
     payload: { fileType, fileName, status },
   });
 }
-
+export const deleteFolder = (id:string)=>{
+  const P = PATIENT_LIST.find((p)=>p.ID == id)
+  try {
+    fs.rmSync(path.join(SETTINGS_CONFIG.rrFolderPath,P?.name!), { recursive: true, force: true });
+    console.log("Folder deleted!");
+  } catch (err) {
+    console.error("Error removing folder:", err);
+  }
+}
 
 export const copyFile = (src:string, dest:string,fileName:string,fileType: 'STL_File_LIST'|'DICOM_FILE_LIST'|'extra',id:string) =>{
-  const destDir = path.join(dest,fileName)
+  const srcPath = src; // no need to join
+  const destPath = path.join(dest, fileName);
+  console.log("src:", fs.existsSync(srcPath));
+  const dir = path.dirname(destPath);
+  console.log("dest:", fs.existsSync(dir));
+
   try{
+    if (!fs.existsSync(dir)) {
+      mkdirSync(dir,{recursive:true})
+      throw new Error("Source file does not exist: " + dir);
+    }
     notify(fileType, fileName, 'pending',id);
-    updateStateOfPatientFiles(id,fileType,fileName,'pending')
-    fs.copyFileSync(src, dest, constants.COPYFILE_EXCL)
+    updateStateOfPatientFiles(id,fileType,srcPath,'pending')
+    fs.copyFileSync(srcPath, destPath, constants.COPYFILE_EXCL)
     notify(fileType, fileName, 'finished',id);
-    updateStateOfPatientFiles(id,fileType,fileName,'finished')
+    updateStateOfPatientFiles(id,fileType,srcPath,'finished')
   }catch(err){
     console.log(err)
   }
@@ -106,3 +123,4 @@ export const startWatching = () => {
     );
   }
 };
+startWatching()

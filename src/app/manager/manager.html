@@ -58,7 +58,6 @@
         <!-- Extra Notes -->
         <div class="form-array-group">
             <h3>Extra</h3>
-
             @for (note of patient().extra; track $index) {
                 <div class="file-entry">
                     <input [(ngModel)]="patient().extra![$index].name" name="extra-{{ $index }}" placeholder="Extra Info" />
@@ -69,7 +68,6 @@
                     <button type="button" (click)="removeExtra($index)">Remove</button>
                 </div>
             }
-
             <button type="button" (click)="addExtra()">Add Extra</button>
         </div>
         <div class="btn">
@@ -92,12 +90,12 @@
                 <p>{{patient?.date?.day + '/' + patient?.date?.month}}</p>
             </div>
             <div class="patient_action">
-                <mat-icon class="stt" (click)="loadPatient(patient)">edit</mat-icon>
+                <!-- <mat-icon  class="stt" (click)="loadPatient(patient)">edit</mat-icon> -->
                 <mat-icon class="stt" (click)="deletePatient(patient.ID)">delete</mat-icon>
             </div>
             <div class="patient_STL">
                 <h5>STLs:</h5>
-                @for(name of patient.DICOM_FILE_LIST; track $index){
+                @for(name of patient.STL_File_LIST; track $index){
                 <div [ngClass]="{
                         'not_found': name.zipping === 'not_found',
                         'pending': name.zipping === 'pending',
@@ -108,7 +106,7 @@
             </div>
             <div class="patient_DICOM">
                 <h5>DICOMs:</h5>
-                @for(name of patient.STL_File_LIST; track $index){
+                @for(name of patient.DICOM_FILE_LIST; track $index){
                 <div [ngClass]="{
                         'not_found': name.zipping === 'not_found',
                         'pending': name.zipping === 'pending',

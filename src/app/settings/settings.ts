@@ -15,7 +15,8 @@ export class Settings implements OnInit {
     deleteAfterExtract: false,
     createStlAndDicomWhenTpDone: false,
     checkStlInDicom:false,
-    createNewPatientFolder:false
+    createNewPatientFolder:false,
+    deletePatientFolderInRR:false
   };
   private readonly localStorageKey = 'appSettings';
   constructor(private api:Api){}

@@ -1,5 +1,6 @@
 import { FileState, Patient } from "../interfaces/websocket";
 import fs from 'fs'
+import { deleteFolder } from "../web/fs-watch";
 
 export let PATIENT_LIST:Patient[] = [];
 
@@ -29,6 +30,7 @@ export const addP  = (P:Patient) =>{
 export const  removeP =(id:string) =>{
     const index = PATIENT_LIST.findIndex((P)=> P.ID = id)
     if(index != -1){
+        deleteFolder(id)
         PATIENT_LIST.splice(index,1)
         savePatients()
     } 
@@ -46,6 +48,9 @@ export const updateP = (patient:Patient)=>{
 
 
 export const  updateStateOfPatientFiles = (id:string,loc:'STL_File_LIST'|'DICOM_FILE_LIST'|'extra',fileName:string,state:FileState['zipping'])=> {
+    if(loc == 'extra'){
+        console.log(fileName)
+    }
     PATIENT_LIST.map((p)=>{
         if(p.ID == id){
             p[loc]?.map((str)=>{
@@ -58,5 +63,8 @@ export const  updateStateOfPatientFiles = (id:string,loc:'STL_File_LIST'|'DICOM_
         }
         return p
     })
+    if(loc == 'extra'){
+        console.log(PATIENT_LIST[0].extra)
+    }
     savePatients()
 }

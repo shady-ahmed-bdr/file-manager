@@ -35,4 +35,5 @@ export interface SettingsTS {
   createStlAndDicomWhenTpDone: boolean;
   checkStlInDicom: boolean;
   createNewPatientFolder: boolean; // lowercase `boolean` here, not `Boolean`
+  deletePatientFolderInRR:boolean;
 }
