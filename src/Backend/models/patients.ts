@@ -30,7 +30,7 @@ export const addP  = (P:Patient) =>{
 export const  removeP =(id:string) =>{
     const index = PATIENT_LIST.findIndex((P)=> P.ID = id)
     if(index != -1){
-        if(SETTINGS_CONFIG && SETTINGS_CONFIG.deleteAfterExtract){
+        if(SETTINGS_CONFIG && SETTINGS_CONFIG.deletePatientFolderInRR){
             deleteFolder(id)
         }
         PATIENT_LIST.splice(index,1)

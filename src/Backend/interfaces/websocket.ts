@@ -36,4 +36,7 @@ export interface SettingsTS {
   checkStlInDicom: boolean;
   createNewPatientFolder: boolean; // lowercase `boolean` here, not `Boolean`
   deletePatientFolderInRR:boolean;
+  archivePath?:string;
+  imagesWatchPath:string;
+  cafWatchPath:string;
 }

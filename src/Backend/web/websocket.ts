@@ -4,11 +4,11 @@ import WebSocket from 'ws';
 
 export const WSS = new WebSocketServer({ noServer: true })
 
-let clientSocket: WebSocket | null = null;
+let clientSocket: WebSocket [] = [];
 
 WSS.on('connection', (ws, request) => {
     console.log('Client connected');
-    clientSocket = ws
+    clientSocket.push(ws)
     ws.on('message', (message) => {
         console.log('Received:', message.toString());
         const msg = JSON.parse(message.toString());
@@ -16,18 +16,22 @@ WSS.on('connection', (ws, request) => {
     });
 
     ws.on('close', () => {
-        console.log('Client disconnected');
+      clientSocket = clientSocket.filter(s => s !== ws);
+      console.log('Client disconnected');
     });
 });
 
 
 
 export function sendToClient(data: any) {
-  if (clientSocket && clientSocket.readyState === WebSocket.OPEN) {
-    clientSocket.send(JSON.stringify(data));
-  } else {
-    console.warn('No active WebSocket connection to send data');
-  }
+  clientSocket.forEach((ws)=>{
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(data));
+    } else {
+      console.warn('No active WebSocket connection to send data');
+    }
+  })
+  
 }
 
 

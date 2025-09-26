@@ -13,10 +13,6 @@
             <label>Month:</label>
             <input name="month" type="number" [(ngModel)]="patient().date.month" required />
         </div>
-        <div>
-            <label>output path</label>
-            <input name="output" [(ngModel)]="patient().out"  />
-        </div>
         <!-- STL Files -->
         <div class="form-array-group">
             <h3>STL Files</h3>
@@ -86,12 +82,13 @@
         @for(patient of PatientList(); track $index){
         <div class="patient">
             <div class="patient_meta">
-                <h1>{{patient.name}} <mat-icon (click)="copy(api.settings.rrFolderPath+'\\'+patient.name)">content_copy</mat-icon> </h1>
+                <h1>{{patient.name}} <mat-icon (click)="copy(rr?  (rr+'\\'+patient.name): patient.name)">content_copy</mat-icon> </h1>
                 <p>{{patient?.date?.day + '/' + patient?.date?.month}}</p>
             </div>
             <div class="patient_action">
                 <mat-icon  class="stt" (click)="loadPatient(patient)">edit</mat-icon>
                 <mat-icon class="stt" (click)="deletePatient(patient.ID)">delete</mat-icon>
+                <mat-icon class="stt" (click)="openDialog(rr?  (rr+'\\'+patient.name): patient.name)">send</mat-icon>
             </div>
             <div class="patient_STL">
                 <h5>STLs:</h5>

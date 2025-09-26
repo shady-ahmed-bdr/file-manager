@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import path from 'path';
+import fs from 'fs/promises';
+
 import { Patient, SettingsTS } from '../interfaces/websocket';
 import {
   addP,
@@ -10,6 +12,7 @@ import {
 import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
 import { copyFile, extractZip  } from '../web/fs-watch';
+import { getDir } from '../models/dir-map';
 
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
@@ -104,24 +107,24 @@ export const updatePatient = (req: Request, res: Response) => {
 
     // --- STL files ---
     patient.STL_File_LIST
-      .filter((f) => f.zipping === 'not_found')
-      .forEach((f) => {
-        const destPathExtra = path.join(
-          SETTINGS_CONFIG.rrFolderPath,
-          patient.name,
-          'OLD',
-          'STL' // 'stl' → 'STL', 'dicom' → 'DICOM'
-        );
-        const filePath = resSearch.foundSTLs.find((p) => path.basename(p) === f.name);
-        if (!filePath) return;
+    .filter((f) => f.zipping === 'not_found')
+    .forEach((f) => {
+      const destPathExtra = path.join(
+        SETTINGS_CONFIG.rrFolderPath,
+        patient.name,
+        'OLD',
+        'STL' // 'stl' → 'STL', 'dicom' → 'DICOM'
+      );
+      const filePath = resSearch.foundSTLs.find((p) => path.basename(p) === f.name);
+      if (!filePath) return;
 
-        if (filePath.endsWith('.zip')) {
-          extractZip(filePath, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
-          copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
-        } else {
-          copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
-        }
-      });
+      if (filePath.endsWith('.zip')) {
+        extractZip(filePath, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
+        copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
+      } else {
+        copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
+      }
+    });
 
     // --- Extra files ---
     patient.extra
@@ -160,3 +163,25 @@ export const setSettings = (req: Request, res: Response) => {
   res.json({ message: 'Settings updated' });
 };
 
+
+export const directory = (req: Request, res: Response) =>{
+  console.log(req.body)
+  const data = getDir(req.body)
+  res.status(200).json(data).end()
+}
+
+export const movePatient = async (req: Request, res: Response) => {
+  try {
+    const { src, dest } = req.body;
+    if (!src || !dest) {
+      res.status(400).json({ error: 'src and dest are required' });
+      return;
+    }
+    const baseName = path.basename(src.trim())
+    await fs.cp(src.trim(), path.join(dest, baseName), { recursive: true });
+    res.json({ success: true, src, dest });
+  } catch (err: any) {
+    console.error('Error copying folder:', err);
+    res.status(500).json({ error: err.message });
+  }
+}

@@ -98,6 +98,7 @@ export const startWatching = () => {
               const destFileDicom = path.join(SETTINGS_CONFIG.rrFolderPath, P.name, 'OLD', 'DICOM');
               if (fileObj.name.endsWith('.zip')) {
                 extractZip(fileP, destFileDicom, 'DICOM_FILE_LIST', fileObj.name, P.ID);
+                copyFile(fileP, destFileDicom, fileObj.name, 'DICOM_FILE_LIST', P.ID);
               } else {
                 copyFile(fileP, destFileDicom, fileObj.name, 'DICOM_FILE_LIST', P.ID);
               }
@@ -113,6 +114,7 @@ export const startWatching = () => {
               const destFileStl = path.join(SETTINGS_CONFIG.rrFolderPath, P.name, 'OLD', 'STL');
               if (fileObj.name.endsWith('.zip')) {
                 extractZip(fileP, destFileStl, 'STL_File_LIST', fileObj.name, P.ID);
+                copyFile(fileP, destFileStl, fileObj.name, 'STL_File_LIST', P.ID);
               } else {
                 copyFile(fileP, destFileStl, fileObj.name, 'STL_File_LIST', P.ID);
               }

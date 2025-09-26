@@ -16,7 +16,10 @@ export class Settings implements OnInit {
     createStlAndDicomWhenTpDone: false,
     checkStlInDicom:false,
     createNewPatientFolder:false,
-    deletePatientFolderInRR:false
+    deletePatientFolderInRR:false,
+    archivePath:'',
+    cafWatchPath:'',
+    imagesWatchPath:''
   };
   private readonly localStorageKey = 'appSettings';
   constructor(private api:Api){}

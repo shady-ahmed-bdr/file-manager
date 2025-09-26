@@ -5,17 +5,38 @@ import { NgClass } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Api } from '../services/api';
 import { Websocket } from '../services/websocket';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { SendDialog } from './send-dialog/send-dialog';
 @Component({
   selector: 'app-manager',
   imports:
-    [MatIconModule,
+    [
+      MatIconModule,
       NgClass,
-      FormsModule
+      FormsModule,
+      MatButtonModule, 
+      MatDialogModule,
     ],
   templateUrl: './manager.html',
   styleUrl: './manager.scss'
 })
 export class Manager implements OnInit {
+  //dialog
+  readonly dialog = inject(MatDialog);
+  openDialog(path:string) {
+    const dialogRef = this.dialog.open(SendDialog, {
+      data: {
+        path
+      },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
+  //
+  
+  
   rr:string =''
   date: Date = new Date()
   month = String(this.date.getMonth() + 1).padStart(2, '0')
@@ -30,7 +51,6 @@ export class Manager implements OnInit {
     ID: ''
   });
   PatientList = signal<Patient[]>([])
-
   ngOnInit(): void {
     this.api.getList()
       .subscribe((data) => {
@@ -49,7 +69,7 @@ export class Manager implements OnInit {
         );
       }
     });
-
+    this.rr = this.api.settings.rrFolderPath
   }
   constructor(private api: Api, private socket: Websocket) { }
   clear() {

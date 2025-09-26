@@ -14,11 +14,14 @@ export interface Patient{
 export interface SettingsTS {
     downFolderPath:string;
     rrFolderPath:string;
+    archivePath:string;
     deleteAfterExtract:boolean;
     createStlAndDicomWhenTpDone:boolean;
     checkStlInDicom:boolean;
     createNewPatientFolder:Boolean;
-    deletePatientFolderInRR:boolean
+    deletePatientFolderInRR:boolean;
+    imagesWatchPath:string
+    cafWatchPath:string
 }
 
 export interface FileState {

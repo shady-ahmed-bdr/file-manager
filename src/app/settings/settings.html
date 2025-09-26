@@ -12,6 +12,21 @@
         </div>
 
         <div>
+            <label for="Archive">Archive base path:</label>
+            <input type="text" id="Archive" name="Archive" [(ngModel)]="settings.archivePath" required />
+        </div>
+
+        <div>
+            <label for="imagesWatch">Images base path:</label>
+            <input type="text" id="imagesWatch" name="imagesWatch" [(ngModel)]="settings.imagesWatchPath" required />
+        </div>
+
+        <div>
+            <label for="CAF">CAF base path:</label>
+            <input type="text" id="CAF" name="CAF" [(ngModel)]="settings.cafWatchPath" required />
+        </div>
+
+        <div>
             <label>
                 <input type="checkbox" name="deleteAfterExtract" [(ngModel)]="settings.deleteAfterExtract" />
                 Delete After Extract

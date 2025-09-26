@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Directory:</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="path">{{paths.toString().replaceAll(',','\\')}}</div>
+  <ul class="dir-list">
+    @for (item of currentDirList(); track $index) {
+      <li>
+        <span class="name">{{item}}</span>
+        <button class="select" (click)="nav(item)">Select</button>
+      </li>
+    }
+  </ul>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button [disabled]="paths.length <= 1" mat-flat-button (click)="backDir()">Back <mat-icon>arrow_back</mat-icon></button>
+  <button matButton  (click)="sendFolder()" cdkFocusInitial>Send</button>
+</mat-dialog-actions>
