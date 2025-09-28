@@ -1,11 +1,18 @@
 <header>
-    <h1 routerLink="/">File Manager</h1>
-    <div class="auth">
-        <mat-icon routerLink="/settings">settings</mat-icon>
-        @if(auth){
-            
-        }@else {
-            <button>login</button>
-        }
-    </div>
+  <h1 routerLink="/">File Manager</h1>
+
+  <nav class="nav-links">
+    <a routerLink="/" routerLinkActive="active">Patients</a>
+    <a routerLink="/directory" routerLinkActive="active">Directory</a>
+    <a routerLink="/sender" routerLinkActive="active">Sender</a>
+  </nav>
+
+  <div class="auth">
+    <mat-icon routerLink="/settings">settings</mat-icon>
+    @if(auth){
+        <!-- user avatar or logout -->
+    }@else {
+        <button>Login</button>
+    }
+  </div>
 </header>

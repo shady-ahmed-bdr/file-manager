@@ -30,6 +30,9 @@ export class Api {
     console.log(this.settings)
     return this.http.post('/settings',{newSettings})
   }
+  openImages(id:string){
+    return this.http.get('/edit_images/'+id)
+  }
 }
 
 /*

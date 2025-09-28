@@ -29,7 +29,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    
+    color: white;
     .patient{
       margin: 10px;
         padding: 20px 30px;
@@ -39,6 +39,7 @@
         grid-template-columns: repeat(8, 1fr);
         grid-auto-rows: minmax(100px, auto);
         box-sizing: border-box;
+        color: white;
 
         .patient_meta{
             display: flex;
@@ -124,17 +125,21 @@ mat-icon{
 }
 
 .patient_action{
-
-    mat-icon{
-        grid-column: 7 / 8;
-        grid-row: 1 / 2;
-        border: 1px solid rgb(0, 35, 133);
-        margin: 5px;
-        border-radius: 3px;
-        &:hover{
-            background-color: rgba(30, 139, 255, 0.251);
-        }
-    }
+  mat-icon{
+      grid-column: 7 / 8;
+      grid-row: 1 / 2;
+      border: 1px solid rgb(0, 35, 133);
+      margin: 5px;
+      border-radius: 3px;
+      &:hover{
+          background-color: rgba(30, 139, 255, 0.251);
+      }
+  }
+  display: flex;
+    grid-column: 7 / 9;
+    grid-row: 1 / 1;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 

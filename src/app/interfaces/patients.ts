@@ -8,7 +8,7 @@ export interface Patient{
     STL_File_LIST:FileState[];
     DICOM_FILE_LIST:FileState[];
     extra?:extra[],
-    out?:string;
+    assets:string[];
 }
 
 export interface SettingsTS {

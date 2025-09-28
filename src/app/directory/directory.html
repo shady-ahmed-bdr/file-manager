@@ -1,0 +1,45 @@
+<div class="directory">
+    <!-- Top bar -->
+    <div class="top-bar">
+        <!-- Path navigation -->
+        <div class="path-bar">
+            @for (part of paths; track $index) {
+                <a (click)="goTo($index)">{{ part }}</a>
+                @if ( $index < paths.length - 1) {
+                    <span>\</span>
+                }
+            }
+        
+        </div>
+        <div class="copy">
+            <mat-icon (click)="copy(paths.toString().replaceAll(',','\\'))">content_copy</mat-icon>
+        </div>
+        <!-- Right side buttons -->
+        <div class="actions button-bar">
+            <input type="text" placeholder="Search (regex)" [(ngModel)]="searchQuery" />
+            @if(searchQuery){
+                <span 
+                class="clear-icon" 
+                (click)="searchQuery = ''"
+                >×</span>
+            }
+            <button [disabled]="paths.length <= 1" mat-flat-button color="primary" (click)="backDir()">
+                <mat-icon>arrow_back</mat-icon> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- File list -->
+    <ul class="file-list">
+        @for (item of filteredList(); track $index) {
+        <li class="file-row">
+            <div class="file-info" (dblclick)="nav(item)">
+                <mat-icon class="file-icon">
+                    {{ isFolder(item) ? 'folder' : 'description' }}
+                </mat-icon>
+                <span class="file-name">{{ item }}</span>
+            </div>
+        </li>
+        }
+    </ul>
+</div>

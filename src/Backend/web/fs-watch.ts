@@ -1,9 +1,9 @@
-import fs, {constants,mkdir, mkdirSync } from 'fs';
+import fs, { promises as fss, constants, mkdir, mkdirSync, FSWatcher } from 'fs';
 import path from 'path';
 import unzipper from 'unzipper';
 import { sendToClient } from '../web/websocket';
 import { SETTINGS_CONFIG } from '../models/settings';
-import { PATIENT_LIST, updateStateOfPatientFiles } from '../models/patients';
+import { PATIENT_LIST, updateP, updateStateOfPatientFiles } from '../models/patients';
 type Status = 'pending' | 'finished' | 'not_found';
 
 
@@ -11,76 +11,83 @@ type Status = 'pending' | 'finished' | 'not_found';
 export async function extractZip(
   filePath: string,
   destDir: string,
-  fileType: 'STL_File_LIST'|'DICOM_FILE_LIST'|'extra',
+  fileType: 'STL_File_LIST' | 'DICOM_FILE_LIST' | 'extra',
   fileName: string,
-  id:string
+  id: string
 ) {
   if (!fs.existsSync(filePath)) {
-    notify(fileType, fileName, 'not_found',id);
+    notify(fileType, fileName, 'not_found', id);
     return;
   }
 
-  notify(fileType, fileName, 'pending',id);
-  updateStateOfPatientFiles(id,fileType,fileName,'pending')
+  notify(fileType, fileName, 'pending', id);
+  updateStateOfPatientFiles(id, fileType, fileName, 'pending')
   try {
     await fs.createReadStream(filePath)
       .pipe(unzipper.Extract({ path: destDir }))
       .promise();
 
-    notify(fileType, fileName, 'finished',id);
-    updateStateOfPatientFiles(id,fileType,fileName,'finished')
+    notify(fileType, fileName, 'finished', id);
+    updateStateOfPatientFiles(id, fileType, fileName, 'finished')
 
   } catch (error) {
     console.error(`Unzip error:`, error);
-    notify(fileType, fileName, 'not_found',id);
-    updateStateOfPatientFiles(id,fileType,fileName,'not_found')
+    notify(fileType, fileName, 'not_found', id);
+    updateStateOfPatientFiles(id, fileType, fileName, 'not_found')
   }
 }
 
-function notify(fileType: 'STL_File_LIST'|'DICOM_FILE_LIST'|'extra', fileName: string, status: Status,id:string) {
+function notify(fileType: 'STL_File_LIST' | 'DICOM_FILE_LIST' | 'extra', fileName: string, status: Status, id: string) {
   sendToClient({
     type: 'file_status',
-    id:id,
+    id: id,
     payload: { fileType, fileName, status },
   });
 }
-export const deleteFolder = (id:string)=>{
-  const P = PATIENT_LIST.find((p)=>p.ID == id)
+export const deleteFolder = (id: string) => {
+  const P = PATIENT_LIST.find((p) => p.ID == id)
   try {
-    fs.rmSync(path.join(SETTINGS_CONFIG.rrFolderPath,P?.name!), { recursive: true, force: true });
+    fs.rmSync(path.join(SETTINGS_CONFIG.rrFolderPath, P?.name!), { recursive: true, force: true });
     console.log("Folder deleted!");
   } catch (err) {
     console.error("Error removing folder:", err);
   }
 }
 
-export const copyFile = (src:string, dest:string,fileName:string,fileType: 'STL_File_LIST'|'DICOM_FILE_LIST'|'extra',id:string) =>{
+export const copyFile = (src: string, dest: string, fileName: string, fileType: 'STL_File_LIST' | 'DICOM_FILE_LIST' | 'extra', id: string) => {
   const srcPath = src; // no need to join
   const destPath = path.join(dest, fileName);
   console.log("src:", fs.existsSync(srcPath));
   const dir = path.dirname(destPath);
   console.log("dest:", fs.existsSync(dir));
 
-  try{
+  try {
     if (!fs.existsSync(dir)) {
-      mkdirSync(dir,{recursive:true})
+      mkdirSync(dir, { recursive: true })
       throw new Error("Source file does not exist: " + dir);
     }
-    notify(fileType, fileName, 'pending',id);
-    updateStateOfPatientFiles(id,fileType,srcPath,'pending')
+    notify(fileType, fileName, 'pending', id);
+    updateStateOfPatientFiles(id, fileType, srcPath, 'pending')
     fs.copyFileSync(srcPath, destPath, constants.COPYFILE_EXCL)
-    notify(fileType, fileName, 'finished',id);
-    updateStateOfPatientFiles(id,fileType,srcPath,'finished')
-  }catch(err){
+    notify(fileType, fileName, 'finished', id);
+    updateStateOfPatientFiles(id, fileType, srcPath, 'finished')
+  } catch (err) {
     console.log(err)
   }
 }
-
+let watchers: FSWatcher[] = []
+export const terminateWatchers = () => {
+  watchers.forEach((W, i) => {
+    console.log('closing: ' + i)
+    W.close()
+  })
+}
 export const startWatching = () => {
-  if (SETTINGS_CONFIG && SETTINGS_CONFIG.downFolderPath) {
-    console.log(SETTINGS_CONFIG.downFolderPath);
 
-    fs.watch(
+  if (SETTINGS_CONFIG && SETTINGS_CONFIG.downFolderPath) {
+    console.log('watching: ' + SETTINGS_CONFIG.downFolderPath);
+
+    watchers[0] = fs.watch(
       SETTINGS_CONFIG.downFolderPath,
       { recursive: false },
       (eventType, filename) => {
@@ -124,5 +131,85 @@ export const startWatching = () => {
       }
     );
   }
+  if (SETTINGS_CONFIG && SETTINGS_CONFIG.cafWatchPath) {
+    console.log('watching: ' + SETTINGS_CONFIG.cafWatchPath);
+    watchers[1] = fs.watch(SETTINGS_CONFIG.cafWatchPath, { recursive: true }, (eventType: fs.WatchEventType, filename: string | null) => {
+      console.log(filename, 'assets manager')
+      if (!filename) return;
+      PATIENT_LIST.map((P) => {
+        const pName = P.name.split(',')[0]
+        const keywords = pName.split(/[ \^]+/);
+        const regex = new RegExp(keywords.join('|'), "i")
+        const base = filename.split('.')[0]
+        console.log(pName, keywords, regex, base, 'baseeeeeeee')
+        if (filename.endsWith('.caf') || filename.endsWith('.zip')) {
+          if (regex.test(base)) {
+            const src = path.join(SETTINGS_CONFIG.cafWatchPath, filename);
+            const dest = path.join(SETTINGS_CONFIG.rrFolderPath, P.name);
+            console.log('src: ', src, ' dest: ', dest)
+            exportAssets(src, dest).then((path) => {
+              fs.unlinkSync(src)
+            })
+          }
+        }
+      })
+    })
+  }
+  if (SETTINGS_CONFIG && SETTINGS_CONFIG.imagesWatchPath) {
+    console.log('watching: ' + SETTINGS_CONFIG.imagesWatchPath);
+    watchers[2] = fs.watch(SETTINGS_CONFIG.imagesWatchPath, { recursive: true }, (eventType: fs.WatchEventType, filename: string | null) => {
+      if (!filename) return;
+      PATIENT_LIST.forEach((P) => {
+        const pName = P.name.split(',')[0]
+        const keywords = pName.split(/[ \^]+/);
+        const regex = new RegExp(keywords.join('|'), "i")
+        const base = filename.split('.')[0]
+        console.log(pName, keywords, regex, base, 'baseeeeeeee')
+        if (filename.endsWith('.png') || filename.endsWith('.jpeg') || filename.endsWith('.jpg')) {
+          if (regex.test(base)) {
+            const src = path.join(SETTINGS_CONFIG.imagesWatchPath, filename);
+            const dest = path.join(SETTINGS_CONFIG.rrFolderPath, P.name);
+            console.log('src: ',fs.existsSync(src),'dest: ',fs.existsSync(dest))
+            console.log('src: ',src,'dest: ',dest)
+            try{
+              exportAssets(src, dest).then((path) => {
+                if(fs.existsSync(src) && fs.existsSync(dest)) updateP({...P,assets: [...P.assets, path]});
+                fs.unlinkSync(src)
+              }).catch((ee)=>{
+                console.log(ee)
+              })
+            }catch(e){
+              console.log(e)
+            }
+            
+          }
+        }
+      })
+    })
+  }
 };
 startWatching()
+
+
+const exportAssets = async (src: string, destDir: string): Promise<string> => {
+  const base = path.basename(src);
+  const ext = path.extname(base);
+  const name = path.basename(base, ext);
+  if (!fs.existsSync(destDir)) {
+    fs.mkdirSync(destDir, { recursive: true });
+  }
+  let targetPath = path.join(destDir, base);
+  let counter = 1;
+
+  while (true) {
+    try {
+      await fss.access(targetPath);
+      targetPath = path.join(destDir, `${name} (${counter++})${ext}`);
+    } catch {
+      break;
+    }
+  }
+
+  await fss.cp(src, targetPath);
+  return targetPath;
+};

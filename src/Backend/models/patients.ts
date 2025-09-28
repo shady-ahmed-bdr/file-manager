@@ -71,3 +71,12 @@ export const  updateStateOfPatientFiles = (id:string,loc:'STL_File_LIST'|'DICOM_
     }
     savePatients()
 }
+export const getP = async (id: string): Promise<Patient> => {
+  const patient = PATIENT_LIST.find((p) => p.ID === id);
+
+  if (!patient) {
+    throw new Error(`Patient with ID ${id} not found`);
+  }
+
+  return patient;
+};

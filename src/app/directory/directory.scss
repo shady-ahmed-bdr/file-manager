@@ -1,0 +1,149 @@
+.directory {
+    padding: 1rem 2rem;
+    background: #1c1c28;
+    color: #e0e0e0;
+
+    .top-bar,
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .top-bar {
+        justify-content: flex-start;
+        margin-bottom: 1rem;
+        align-items: center;
+        display: flex;
+        .copy{
+            cursor: pointer;
+            padding: 10px;
+            &:active{
+                color: #00d4ff;
+            }
+        }
+    }
+
+    .path-bar {
+        background: #2a2a3d;
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+
+        a {
+            color: #00d4ff;
+            cursor: pointer;
+
+            &:hover {
+                color: #6c63ff;
+            }
+        }
+    }
+
+    .actions {
+        width: 350px;
+
+        input {
+            flex: 1;
+            padding: 0.5rem 2rem 0.5rem 0.8rem;
+            border: none;
+            border-radius: 6px;
+            background: #2a2a3d;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .clear-icon {
+            position: absolute;
+            right: 140px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: #aaa;
+            cursor: pointer;
+            user-select: none;
+            padding: 12px;
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
+
+    .file-list {
+        list-style: none;
+        padding: 0;
+
+        .file-row {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            background: #2a2a3d;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+
+            &:hover {
+                background: #34344a;
+            }
+
+            .file-info {
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+
+                .file-icon {
+                    font-size: 1.6rem;
+                    color: #f1c40f; // folder yellow
+                }
+            }
+        }
+    }
+}
+
+button {
+    background: linear-gradient(90deg, #3498db, #6c63ff);
+    color: #fff;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(90deg, #2980b9, #5145cd);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    &:active:not(:disabled) {
+        transform: scale(0.97);
+    }
+
+    &:disabled {
+        background: #444;
+        color: #aaa;
+        cursor: not-allowed;
+        box-shadow: none;
+        opacity: 0.6;
+    }
+}
+
+.button-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+
+    position: fixed;
+    top: 75px;
+    right: 0;
+    width: 400px;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    background: rgba(4, 39, 95, 0.4);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    z-index: 1100;
+}

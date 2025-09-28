@@ -89,6 +89,7 @@
                 <mat-icon  class="stt" (click)="loadPatient(patient)">edit</mat-icon>
                 <mat-icon class="stt" (click)="deletePatient(patient.ID)">delete</mat-icon>
                 <mat-icon class="stt" (click)="openDialog(rr?  (rr+'\\'+patient.name): patient.name)">send</mat-icon>
+                <mat-icon class="stt" (click)="editImg(patient.ID)">photo</mat-icon>
             </div>
             <div class="patient_STL">
                 <h5>STLs:</h5>

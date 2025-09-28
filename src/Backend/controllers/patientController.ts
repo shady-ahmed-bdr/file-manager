@@ -7,12 +7,14 @@ import {
   addP,
   removeP,
   updateP,
-  PATIENT_LIST
+  PATIENT_LIST,
+  getP
 } from '../models/patients';
 import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
-import { copyFile, extractZip  } from '../web/fs-watch';
+import { copyFile, extractZip, startWatching, terminateWatchers } from '../web/fs-watch';
 import { getDir } from '../models/dir-map';
+import { open_in_paint } from '../windows/child-one';
 
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
@@ -23,10 +25,10 @@ export const removePatient = (req: Request, res: Response) => {
 export const addPatient = (req: Request, res: Response) => {
   const { patient, settings: newSettings }: { patient: Patient; settings: SettingsTS } = req.body;
   patient.name = patient.name.trim()
-  patient.extra = patient.extra?.map((ePath)=> {
+  patient.extra = patient.extra?.map((ePath) => {
     ePath.name = ePath.name.replace(/^"(.*)"$/, "$1")
     return ePath
-  }) 
+  })
   addP(patient)
   saveSettings(newSettings);
   initNewDir(patient.name)
@@ -77,7 +79,7 @@ export const updatePatient = (req: Request, res: Response) => {
   const { patient, settings: newSettings }: { patient: Patient; settings: SettingsTS } = req.body;
   console.log(patient)
   patient.name = patient.name.trim()
-  patient.extra = patient.extra?.map((ePath)=> {
+  patient.extra = patient.extra?.map((ePath) => {
     ePath.name = ePath.name.replace(/^"(.*)"$/, "$1")
     return ePath
   })
@@ -107,24 +109,24 @@ export const updatePatient = (req: Request, res: Response) => {
 
     // --- STL files ---
     patient.STL_File_LIST
-    .filter((f) => f.zipping === 'not_found')
-    .forEach((f) => {
-      const destPathExtra = path.join(
-        SETTINGS_CONFIG.rrFolderPath,
-        patient.name,
-        'OLD',
-        'STL' // 'stl' → 'STL', 'dicom' → 'DICOM'
-      );
-      const filePath = resSearch.foundSTLs.find((p) => path.basename(p) === f.name);
-      if (!filePath) return;
+      .filter((f) => f.zipping === 'not_found')
+      .forEach((f) => {
+        const destPathExtra = path.join(
+          SETTINGS_CONFIG.rrFolderPath,
+          patient.name,
+          'OLD',
+          'STL' // 'stl' → 'STL', 'dicom' → 'DICOM'
+        );
+        const filePath = resSearch.foundSTLs.find((p) => path.basename(p) === f.name);
+        if (!filePath) return;
 
-      if (filePath.endsWith('.zip')) {
-        extractZip(filePath, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
-        copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
-      } else {
-        copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
-      }
-    });
+        if (filePath.endsWith('.zip')) {
+          extractZip(filePath, destPathExtra, 'STL_File_LIST', f.name, patient.ID);
+          copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
+        } else {
+          copyFile(filePath, destPathExtra, f.name, 'STL_File_LIST', patient.ID);
+        }
+      });
 
     // --- Extra files ---
     patient.extra
@@ -157,14 +159,16 @@ export const getList = (_req: Request, res: Response) => {
 };
 
 export const setSettings = (req: Request, res: Response) => {
-  const {newSettings} = req.body;
+  const { newSettings } = req.body;
   console.log(newSettings, 'post')
   saveSettings(newSettings);
+  terminateWatchers()
+  startWatching()
   res.json({ message: 'Settings updated' });
 };
 
 
-export const directory = (req: Request, res: Response) =>{
+export const directory = (req: Request, res: Response) => {
   console.log(req.body)
   const data = getDir(req.body)
   res.status(200).json(data).end()
@@ -183,5 +187,25 @@ export const movePatient = async (req: Request, res: Response) => {
   } catch (err: any) {
     console.error('Error copying folder:', err);
     res.status(500).json({ error: err.message });
+  }
+}
+
+
+export const editImagesPatient = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    getP(id)
+      .then((patient) => {
+        patient.assets.forEach((img) => {
+          open_in_paint(img);
+        })
+      }).catch((e)=>{
+        res.status(404).json({ success: false, error: 'not found' });
+      })
+    res.json({ success: true, message: `Image ${id} opened for editing` });
+  } catch (err) {
+    console.error('Error opening image:', err);
+    res.status(500).json({ success: false, error: 'Failed to open image' });
   }
 }

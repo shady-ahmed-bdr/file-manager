@@ -35,7 +35,16 @@ export class Manager implements OnInit {
     });
   }
   //
-  
+  editImg(id:string){
+    this.api.openImages(id).subscribe({
+      next:(res)=>{
+        
+      },
+      error:()=>{
+        alert('No images was found in Patient folder')
+      }
+    })
+  }
   
   rr:string =''
   date: Date = new Date()
@@ -48,7 +57,8 @@ export class Manager implements OnInit {
     STL_File_LIST: [],
     DICOM_FILE_LIST: [],
     extra: [],
-    ID: ''
+    ID: '',
+    assets:[]
   });
   PatientList = signal<Patient[]>([])
   ngOnInit(): void {
@@ -79,18 +89,19 @@ export class Manager implements OnInit {
       STL_File_LIST: [],
       DICOM_FILE_LIST: [],
       extra: [],
-      ID: crypto.randomUUID()
+      ID: crypto.randomUUID(),
+      assets:[]
     });
   }
 
   copy(text: string) {
     navigator.clipboard.writeText(text)
-      .then(() => {
-        console.log('Text copied to clipboard:', text);
-      })
-      .catch(err => {
-        console.error('Failed to copy text: ', err);
-      });
+    .then(() => {
+      console.log('Text copied to clipboard:', text);
+    })
+    .catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
   }
   addFile(list: FileState[]) {
     list.push({ name: '', zipping: 'not_found' });
@@ -204,7 +215,8 @@ export class Manager implements OnInit {
             STL_File_LIST: [],
             DICOM_FILE_LIST: [],
             extra: [],
-            ID: crypto.randomUUID()
+            ID: crypto.randomUUID(),
+            assets:[]
           })
         },
         error: (err) => {
