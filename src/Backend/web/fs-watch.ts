@@ -96,7 +96,6 @@ export const startWatching = () => {
         console.log(`[${eventType}]`, filename);
 
         PATIENT_LIST.forEach((P) => {
-          // ---- DICOM ----
           const D_index = P.DICOM_FILE_LIST.findIndex(f => f.name === filename);
           if (D_index !== -1) {
             const fileObj = P.DICOM_FILE_LIST[D_index];
@@ -111,8 +110,6 @@ export const startWatching = () => {
               }
             }
           }
-
-          // ---- STL ----
           const S_index = P.STL_File_LIST.findIndex(f => f.name === filename);
           if (S_index !== -1) {
             const fileObj = P.STL_File_LIST[S_index];
@@ -148,7 +145,7 @@ export const startWatching = () => {
             const dest = path.join(SETTINGS_CONFIG.rrFolderPath, P.name);
             console.log('src: ', src, ' dest: ', dest)
             exportAssets(src, dest).then((path) => {
-              fs.unlinkSync(src)
+              if(path)fs.unlinkSync(src)
             })
           }
         }
@@ -172,12 +169,13 @@ export const startWatching = () => {
             console.log('src: ',fs.existsSync(src),'dest: ',fs.existsSync(dest))
             console.log('src: ',src,'dest: ',dest)
             try{
-              exportAssets(src, dest).then((path) => {
-                if(fs.existsSync(src) && fs.existsSync(dest)) updateP({...P,assets: [...P.assets, path]});
+              setTimeout(()=>{
+                exportAssets(src, dest).then((path) => {
                 fs.unlinkSync(src)
-              }).catch((ee)=>{
-                console.log(ee)
-              })
+                }).catch((ee)=>{
+                  console.log(ee)
+                })
+              },1000)
             }catch(e){
               console.log(e)
             }
@@ -195,6 +193,7 @@ const exportAssets = async (src: string, destDir: string): Promise<string> => {
   const base = path.basename(src);
   const ext = path.extname(base);
   const name = path.basename(base, ext);
+  if(!fs.existsSync(src)) return '';
   if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true });
   }

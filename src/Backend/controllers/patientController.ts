@@ -14,7 +14,7 @@ import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
 import { copyFile, extractZip, startWatching, terminateWatchers } from '../web/fs-watch';
 import { getDir } from '../models/dir-map';
-import { open_in_paint } from '../windows/child-one';
+import { open_explorer, open_file, open_in_paint } from '../windows/child-one';
 
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
@@ -197,9 +197,13 @@ export const editImagesPatient = async (req: Request, res: Response) => {
   try {
     getP(id)
       .then((patient) => {
-        patient.assets.forEach((img) => {
-          open_in_paint(img);
+        const PtFolderPath = path.join(SETTINGS_CONFIG.rrFolderPath, patient.name)
+        fs.readdir(PtFolderPath).then((dir)=>{
+          dir.filter((s)=>s.toLowerCase().endsWith('.png')||s.toLowerCase().endsWith('.jpeg')).forEach((p)=>{
+            open_in_paint(path.join(PtFolderPath,p));
+          })
         })
+        
       }).catch((e)=>{
         res.status(404).json({ success: false, error: 'not found' });
       })
@@ -209,3 +213,29 @@ export const editImagesPatient = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: 'Failed to open image' });
   }
 }
+
+
+
+export const openExplorerController = async (req: Request, res: Response) => {
+  try {
+    const { path } = req.body;
+
+    open_explorer(path); // your existing logic
+    res.json({ success: true, path });
+  } catch (err) {
+    console.error("openExplorerController error:", err);
+    res.status(500).json({ success: false, error: "Failed to open explorer" });
+  }
+};
+
+export const runFileController = async (req: Request, res: Response) => {
+  try {
+    const { path } = req.body;
+    console.log(path,'runFileController')
+    open_file(path); // your existing logic
+    res.json({ success: true, path });
+  } catch (err) {
+    console.error("runFileController error:", err);
+    res.status(500).json({ success: false, error: "Failed to open file" });
+  }
+};

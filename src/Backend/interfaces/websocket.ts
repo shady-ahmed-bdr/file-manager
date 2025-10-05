@@ -24,7 +24,6 @@ export interface Patient {
   STL_File_LIST: FileState[];
   DICOM_FILE_LIST: FileState[];
   extra?: Extra[];
-  assets:string[];
 }
 
 

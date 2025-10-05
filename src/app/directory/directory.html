@@ -1,27 +1,34 @@
 <div class="directory">
-    <!-- Top bar -->
-    <div class="top-bar">
-        <!-- Path navigation -->
-        <div class="path-bar">
-            @for (part of paths; track $index) {
-                <a (click)="goTo($index)">{{ part }}</a>
-                @if ( $index < paths.length - 1) {
-                    <span>\</span>
+
+    <div class="actions button-bar">
+        <div class="right-side">
+            <div class="path_container">
+                <div class="path-bar">
+                    @for (part of paths; track $index) {
+                        <a (click)="goTo($index)">{{ part }}</a>
+                        @if ($index < paths.length - 1) { 
+                            <span>\</span>
+                        }
+                    }
+                </div>
+                <mat-icon (click)="copy(paths.join('\\'))">content_copy</mat-icon>
+            </div>
+        </div>
+        <div class="center-side">
+            <div class="hot-links">
+                <span class="hot-links-label">Quick Access:</span>
+                @for (link of hotLinks; track link.name) {
+                <a class="hot-link">
+                    <mat-icon>{{ link.icon }}</mat-icon>
+                    {{ link.name }}
+                </a>
                 }
-            }
-        
+            </div>
         </div>
-        <div class="copy">
-            <mat-icon (click)="copy(paths.toString().replaceAll(',','\\'))">content_copy</mat-icon>
-        </div>
-        <!-- Right side buttons -->
-        <div class="actions button-bar">
+        <div class="left-side">
             <input type="text" placeholder="Search (regex)" [(ngModel)]="searchQuery" />
             @if(searchQuery){
-                <span 
-                class="clear-icon" 
-                (click)="searchQuery = ''"
-                >×</span>
+                <span class="clear-icon" (click)="searchQuery = ''">×</span>
             }
             <button [disabled]="paths.length <= 1" mat-flat-button color="primary" (click)="backDir()">
                 <mat-icon>arrow_back</mat-icon> Back
@@ -32,12 +39,23 @@
     <!-- File list -->
     <ul class="file-list">
         @for (item of filteredList(); track $index) {
-        <li class="file-row">
-            <div class="file-info" (dblclick)="nav(item)">
+        <li class="file-row" (dblclick)="nav(item)">
+            <div class="file-info" >
                 <mat-icon class="file-icon">
                     {{ isFolder(item) ? 'folder' : 'description' }}
                 </mat-icon>
                 <span class="file-name">{{ item }}</span>
+            </div>
+            <div class="icc_list">
+                @if(!isFolder(item)){
+                    <mat-icon class="icc" (click)="cpWithQ(paths.join('\\')+'\\'+item)">content_copy</mat-icon>
+                    <mat-icon class="icc" (click)="runFile(paths.join('\\')+'\\'+item)">play_arrow</mat-icon>
+                    <mat-icon class="icc" (click)="openInExplorer(paths.join('\\'))">folder_open</mat-icon>
+                }
+                @if(isFolder(item)){
+                    <mat-icon class="icc" (click)="copy(paths.join('\\')+'\\'+item)">content_copy</mat-icon>
+                    <mat-icon class="icc" (click)="openInExplorer(paths.join('\\')+'\\'+item)">folder_open</mat-icon>
+                }
             </div>
         </li>
         }

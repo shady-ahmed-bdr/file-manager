@@ -12,6 +12,12 @@ import { FormsModule } from '@angular/forms';
 })
 export class Directory {
 currentDirList = signal<string[]>([]);
+hotLinks = [
+    { name: 'Documents', path: 'C:\\Users\\Documents', icon: 'description' },
+    { name: 'Downloads', path: 'C:\\Users\\Downloads', icon: 'file_download' },
+    { name: 'Desktop', path: 'C:\\Users\\Desktop', icon: 'desktop_windows' },
+    { name: 'Projects', path: 'C:\\Projects', icon: 'folder' }
+];
   base!:string;
   constructor(){
     const savedSettings = localStorage.getItem('appSettings');
@@ -77,7 +83,7 @@ currentDirList = signal<string[]>([]);
     }
   }
 
-    copy(text: string) {
+  copy(text: string) {
     navigator.clipboard.writeText(text)
     .then(() => {
       console.log('Text copied to clipboard:', text);
@@ -85,5 +91,36 @@ currentDirList = signal<string[]>([]);
     .catch(err => {
       console.error('Failed to copy text: ', err);
     });
+  }
+  cpWithQ(text: string){
+    navigator.clipboard.writeText('"'+text+'"')
+    .then(() => {
+      console.log('Text copied to clipboard:', text);
+    })
+    .catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
+  }
+  openInExplorer(path:string){
+    this.http.post('/open_exp',{path})
+    .subscribe({
+      next:()=>{
+
+      },
+      error:()=>{
+        alert('Something went Wrong')
+      }
+    })
+  }
+  runFile(path:string){
+    this.http.post('/open_file',{path})
+    .subscribe({
+      next:()=>{
+
+      },
+      error:()=>{
+        alert('Something went Wrong')
+      }
+    })
   }
 }

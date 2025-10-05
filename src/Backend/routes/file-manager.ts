@@ -8,6 +8,8 @@ import {
   directory,
   movePatient,
   editImagesPatient,
+  openExplorerController,
+  runFileController,
 } from '../controllers/patientController';
 
 export const router = Router();
@@ -20,3 +22,5 @@ router.post('/settings', setSettings);
 router.post('/path', directory)
 router.patch('/p_folder',movePatient)
 router.get('/edit_images/:id', editImagesPatient)
+router.post('/open_exp', openExplorerController)
+router.post('/open_file', runFileController)
