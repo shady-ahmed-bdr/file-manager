@@ -4,6 +4,7 @@ import unzipper from 'unzipper';
 import { sendToClient } from '../web/websocket';
 import { SETTINGS_CONFIG } from '../models/settings';
 import { PATIENT_LIST, updateP, updateStateOfPatientFiles } from '../models/patients';
+import { unzipWithPassword } from '../windows/child-one';
 type Status = 'pending' | 'finished' | 'not_found';
 
 
@@ -32,8 +33,14 @@ export async function extractZip(
 
   } catch (error) {
     console.error(`Unzip error:`, error);
-    notify(fileType, fileName, 'not_found', id);
-    updateStateOfPatientFiles(id, fileType, fileName, 'not_found')
+    try{
+      unzipWithPassword(filePath,destDir,'ewoo3ddx')
+      notify(fileType, fileName, 'finished', id);
+      updateStateOfPatientFiles(id, fileType, fileName, 'finished')
+    }catch(e){
+      notify(fileType, fileName, 'not_found', id);
+      updateStateOfPatientFiles(id, fileType, fileName, 'not_found')
+    }
   }
 }
 

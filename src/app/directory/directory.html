@@ -17,8 +17,8 @@
         <div class="center-side">
             <div class="hot-links">
                 <span class="hot-links-label">Quick Access:</span>
-                @for (link of hotLinks; track link.name) {
-                <a class="hot-link">
+                @for (link of hotLinks(); track link.name) {
+                <a class="hot-link" [class.active]="link.path === paths[0]" (click)="newDir(link.path)">
                     <mat-icon>{{ link.icon }}</mat-icon>
                     {{ link.name }}
                 </a>
@@ -40,7 +40,7 @@
     <ul class="file-list">
         @for (item of filteredList(); track $index) {
         <li class="file-row" (dblclick)="nav(item)">
-            <div class="file-info" >
+            <div class="file-info" (click)="nav(item)"  >
                 <mat-icon class="file-icon">
                     {{ isFolder(item) ? 'folder' : 'description' }}
                 </mat-icon>

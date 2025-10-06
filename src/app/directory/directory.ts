@@ -12,17 +12,22 @@ import { FormsModule } from '@angular/forms';
 })
 export class Directory {
 currentDirList = signal<string[]>([]);
-hotLinks = [
-    { name: 'Documents', path: 'C:\\Users\\Documents', icon: 'description' },
-    { name: 'Downloads', path: 'C:\\Users\\Downloads', icon: 'file_download' },
-    { name: 'Desktop', path: 'C:\\Users\\Desktop', icon: 'desktop_windows' },
-    { name: 'Projects', path: 'C:\\Projects', icon: 'folder' }
-];
+hotLinks = signal<{name:string,path:string,icon:string}[]>([])
   base!:string;
   constructor(){
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
       this.base = (<SettingsTS>JSON.parse(savedSettings)).archivePath ;
+      this.hotLinks.update((r)=>{
+        const settings = (<SettingsTS>JSON.parse(savedSettings))
+        const keys:any = [];
+        if(settings && settings.rrFolderPath)keys.push({ name: 'RR', path: settings.rrFolderPath, icon: 'folder' })
+        if(settings && settings.downFolderPath)keys.push({ name: 'Downloads', path: settings.downFolderPath, icon: 'file_download' })
+        if(settings && settings.archivePath)keys.push({ name: 'Work Dir', path: settings.archivePath, icon: 'folder' })
+        if(settings && settings.imagesWatchPath)keys.push({ name: 'Images', path: settings.imagesWatchPath, icon: 'image' })
+        r = [...keys] 
+        return r
+      })
       this.paths[0] = this.base
       this.nav()
     }
@@ -82,7 +87,11 @@ hotLinks = [
       return this.currentDirList();
     }
   }
-
+  newDir(str:string){
+    this.paths.length = 0;
+    this.paths[0] = str
+    this.nav()
+  }
   copy(text: string) {
     navigator.clipboard.writeText(text)
     .then(() => {
