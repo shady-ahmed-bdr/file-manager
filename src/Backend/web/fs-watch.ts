@@ -4,7 +4,7 @@ import unzipper from 'unzipper';
 import { sendToClient } from '../web/websocket';
 import { SETTINGS_CONFIG } from '../models/settings';
 import { PATIENT_LIST, updateP, updateStateOfPatientFiles } from '../models/patients';
-import { unzipWithPassword } from '../windows/child-one';
+import { unzipWithPassword } from './file-dir';
 type Status = 'pending' | 'finished' | 'not_found';
 
 

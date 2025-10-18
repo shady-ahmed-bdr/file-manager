@@ -1,7 +1,7 @@
 import fs from 'fs';
 import  { mkdir } from 'fs/promises';
 import path from 'path';
-
+import unzipper from "unzipper";
 import {SETTINGS_CONFIG} from '../models/settings';
 import { FileState } from '../interfaces/websocket';
 
@@ -42,4 +42,23 @@ export const directSearch = (STLs:FileState[], DICOM:FileState[])=>{
         }
     }
     return { foundSTLs, foundDICOMs };
+}
+
+
+export async function unzipWithPassword(src: string, dest: string, password: string) {
+  const directory = await unzipper.Open.file(src);
+
+  for (const file of directory.files) {
+    console.log(`Extracting: ${file.path}`);
+
+    // decrypt and extract
+    const content = await file.buffer(password);
+
+    const outputPath = `${dest}/${file.path}`;
+    const dir = outputPath.substring(0, outputPath.lastIndexOf("/"));
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(outputPath, content);
+  }
+
+  console.log("Extraction complete!");
 }
