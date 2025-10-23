@@ -43,3 +43,16 @@ export interface SettingsTS {
     destDir:string
   }
 }
+
+
+export interface DirectoryInfo {
+  name: string;
+  path: string;
+}
+
+export interface DirectoryWatcher {
+  dirs: DirectoryInfo[];
+  workingDir: DirectoryInfo | null;
+  add(dir: DirectoryInfo): void;
+  remove(path: string): void;
+}

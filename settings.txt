@@ -1,11 +1,16 @@
 {
-  "downFolderPath": "C:\\Users\\shady\\Downloads",
-  "rrFolderPath": "D:\\RR",
+  "downFolderPath": "C:\\\\Users\\\\pc\\\\Downloads",
+  "rrFolderPath": "E:\\\\RR",
   "deleteAfterExtract": false,
   "createStlAndDicomWhenTpDone": false,
   "checkStlInDicom": false,
   "createNewPatientFolder": false,
-  "deletePatientFolderInRR": true,
-  "archivePath": "C:\\Users\\shady",
-  "imagesWatchPath": "D:\\imgs"
+  "deletePatientFolderInRR": false,
+  "archivePath": "C:\\\\Users\\\\pc\\\\OneDrive\\\\المستندات",
+  "cafWatchPath": "",
+  "imagesWatchPath": "E:\\\\imgs",
+  "pathology": {
+    "srcDir": "E:\\\\new",
+    "destDir": "E:\\\\nnnn"
+  }
 }
