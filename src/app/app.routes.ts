@@ -3,10 +3,12 @@ import { Manager }from './manager/manager';
 import { Settings } from './settings/settings';
 import { Sender } from './sender/sender';
 import { Directory } from './directory/directory';
+import { Pathology } from './pathology/pathology';
 
 export const routes: Routes = [
     {path:'',component: Manager},
     {path:'settings', component:Settings},
     {path:'directory', component:Directory},
     {path:'sender', component:Sender},
+    {path:'pathology',component:Pathology}
 ];

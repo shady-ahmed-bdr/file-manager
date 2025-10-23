@@ -21,7 +21,11 @@ export interface SettingsTS {
     createNewPatientFolder:Boolean;
     deletePatientFolderInRR:boolean;
     imagesWatchPath:string
-    cafWatchPath:string
+    cafWatchPath:string,
+    pathology:{
+        srcDir:string,
+        destDir:string
+    }
 }
 
 export interface FileState {

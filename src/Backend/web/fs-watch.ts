@@ -27,10 +27,8 @@ export async function extractZip(
     await fs.createReadStream(filePath)
       .pipe(unzipper.Extract({ path: destDir }))
       .promise();
-
     notify(fileType, fileName, 'finished', id);
     updateStateOfPatientFiles(id, fileType, fileName, 'finished')
-
   } catch (error) {
     console.error(`Unzip error:`, error);
     try{

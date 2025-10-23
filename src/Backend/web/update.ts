@@ -79,8 +79,8 @@ async function syncFolder(src:string, dest:string,caseNum:string) {
 	}
 }
 
-async function main() {
-	let cases = await readCaseNumbers(caseListFile);
+async function main(casesList:string[]) {
+	let cases = await readCaseNumbers(caseListFile);//
 	const items = await fs.readdir(originalRoot);
 	let len  = 1
 	const total = items.length
@@ -121,7 +121,3 @@ async function main() {
 	C('✅ Sync complete.');
 }
 
-main().catch(err => {
-	console.error('❌ Error:', err.message);
-	process.exit(1);
-});

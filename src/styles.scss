@@ -6,6 +6,7 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+
 html {
   @include mat.theme((
     color: (
@@ -15,8 +16,34 @@ html {
     typography: Roboto,
     density: 0,
   ));
-}
 
+}
+:root {
+  @include mat.tabs-overrides((
+    background-color: #000, // your dark background
+    foreground-color: #fff,
+    divider-color: #444,
+
+    active-indicator-color: #00bcd4,
+    active-label-text-color: #fff,
+    active-hover-label-text-color: #fff,
+    active-focus-label-text-color: #fff,
+    active-focus-indicator-color: #00bcd4,
+
+    inactive-label-text-color: #aaa,
+    inactive-hover-label-text-color: #fff,
+    inactive-focus-label-text-color: #fff,
+
+    // 👇 override ripple & hover ink
+    inactive-ripple-color: rgba(255,255,255,0.2),
+    active-ripple-color: rgba(255,255,255,0.2),
+    disabled-ripple-color: rgba(255,255,255,0.1),
+
+    // optional: add a hint color for pagination arrows if visible
+    pagination-icon-color: #fff,
+    label-text-weight: 600
+  ));
+}
 body {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the

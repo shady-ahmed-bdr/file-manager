@@ -33,9 +33,13 @@ export interface SettingsTS {
   deleteAfterExtract: boolean;
   createStlAndDicomWhenTpDone: boolean;
   checkStlInDicom: boolean;
-  createNewPatientFolder: boolean; // lowercase `boolean` here, not `Boolean`
+  createNewPatientFolder: boolean; 
   deletePatientFolderInRR:boolean;
   archivePath?:string;
   imagesWatchPath:string;
   cafWatchPath:string;
+  pathology:{
+    srcDir:string,
+    destDir:string
+  }
 }

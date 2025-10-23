@@ -19,7 +19,11 @@ export class Settings implements OnInit {
     deletePatientFolderInRR:false,
     archivePath:'',
     cafWatchPath:'',
-    imagesWatchPath:''
+    imagesWatchPath:'',
+    pathology:{
+      srcDir: '',
+      destDir:''
+    }
   };
   private readonly localStorageKey = 'appSettings';
   constructor(private api:Api){}

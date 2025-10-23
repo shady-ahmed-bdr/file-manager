@@ -18,14 +18,28 @@
 
         <div>
             <label for="imagesWatch">Images base path:</label>
-            <input type="text" id="imagesWatch" name="imagesWatch" [(ngModel)]="settings.imagesWatchPath"  />
+            <input type="text" id="imagesWatch" name="imagesWatch" [(ngModel)]="settings.imagesWatchPath" />
         </div>
 
         <div>
             <label for="CAF">CAF base path:</label>
-            <input type="text" id="CAF" name="CAF" [(ngModel)]="settings.cafWatchPath"  />
+            <input type="text" id="CAF" name="CAF" [(ngModel)]="settings.cafWatchPath" />
         </div>
+        <fieldset class="pathology-group">
+            <legend>Pathology</legend>
 
+            <div>
+                <label for="pathSrcDir">Source Directory:</label>
+                <input type="text" id="pathSrcDir" name="pathologySrcDir" [(ngModel)]="settings.pathology.srcDir"
+                    required />
+            </div>
+
+            <div>
+                <label for="pathDestDir">Destination Directory:</label>
+                <input type="text" id="pathDestDir" name="pathologyDestDir" [(ngModel)]="settings.pathology.destDir"
+                    required />
+            </div>
+        </fieldset>
         <div>
             <label>
                 <input type="checkbox" name="deleteAfterExtract" [(ngModel)]="settings.deleteAfterExtract" />
@@ -45,19 +59,18 @@
                 Create STL and DICOM When TP Done
             </label>
         </div>
-        
+
         <div>
             <label>
-                <input type="checkbox" name="checkStlInDicom"
-                    [(ngModel)]="settings.checkStlInDicom" />
+                <input type="checkbox" name="checkStlInDicom" [(ngModel)]="settings.checkStlInDicom" />
                 Check STL in DICOM
             </label>
         </div>
 
         <div>
             <label>
-                <input type="checkbox" name="createNewPatientFolder"
-                    [(ngModel)]="settings.createNewPatientFolder"  disabled/>
+                <input type="checkbox" name="createNewPatientFolder" [(ngModel)]="settings.createNewPatientFolder"
+                    disabled />
                 Create new Patient folder in server (experimental)
             </label>
         </div>
