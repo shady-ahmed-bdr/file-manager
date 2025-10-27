@@ -8,13 +8,15 @@ import {
   removeP,
   updateP,
   PATIENT_LIST,
-  getP
+  getP,
+  handlePatientFolder
 } from '../models/patients';
 import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch } from '../web/file-dir';
 import { copyFile, extractZip, startWatching, terminateWatchers } from '../web/fs-watch';
 import { getDir } from '../models/dir-map';
 import { open_explorer, open_file, open_in_paint } from '../windows/child-one';
+import { runTransfer } from '../web/transfer';
 
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
@@ -167,27 +169,37 @@ export const setSettings = (req: Request, res: Response) => {
   res.json({ message: 'Settings updated' });
 };
 
-
 export const directory = (req: Request, res: Response) => {
   console.log(req.body)
   const data = getDir(req.body)
   res.status(200).json(data).end()
 }
 
+// export const movePatient = async (req: Request, res: Response) => {
+//   const { src, dest, moveExisting, newFolderName } = req.body;
+//   if (!src || !dest) {
+//     res.status(400).json({ error: 'src and dest are required' });
+//     return;
+//   }
+
+//   const result = await handlePatientFolder({
+//     patientFolder: src.trim(),
+//     serverListDir: dest.trim(),
+//     checkbox: Boolean(moveExisting),
+//     select: newFolderName || null
+//   });
+
+//   res.json(result);
+// };
 export const movePatient = async (req: Request, res: Response) => {
-  try {
-    const { src, dest } = req.body;
-    if (!src || !dest) {
-      res.status(400).json({ error: 'src and dest are required' });
-      return;
-    }
-    const baseName = path.basename(src.trim())
-    await fs.cp(src.trim(), path.join(dest, baseName), { recursive: true });
-    res.json({ success: true, src, dest });
-  } catch (err: any) {
-    console.error('Error copying folder:', err);
-    res.status(500).json({ error: err.message });
-  }
+   try { const { src, dest } = req.body; 
+   if (!src || !dest) { 
+    res.status(400).json({ error: 'src and dest are required' }); 
+    return; 
+  } const baseName = path.basename(src.trim()) 
+  await fs.cp(src.trim(), path.join(dest, baseName), { recursive: true }); 
+  res.json({ success: true, src, dest }); 
+  } catch (err: any) { console.error('Error copying folder:', err); res.status(500).json({ error: err.message }); } 
 }
 
 
@@ -198,13 +210,13 @@ export const editImagesPatient = async (req: Request, res: Response) => {
     getP(id)
       .then((patient) => {
         const PtFolderPath = path.join(SETTINGS_CONFIG.rrFolderPath, patient.name)
-        fs.readdir(PtFolderPath).then((dir)=>{
-          dir.filter((s)=>s.toLowerCase().endsWith('.png')||s.toLowerCase().endsWith('.jpeg')).forEach((p)=>{
-            open_in_paint(path.join(PtFolderPath,p));
+        fs.readdir(PtFolderPath).then((dir) => {
+          dir.filter((s) => s.toLowerCase().endsWith('.png') || s.toLowerCase().endsWith('.jpeg')).forEach((p) => {
+            open_in_paint(path.join(PtFolderPath, p));
           })
         })
-        
-      }).catch((e)=>{
+
+      }).catch((e) => {
         res.status(404).json({ success: false, error: 'not found' });
       })
     res.json({ success: true, message: `Image ${id} opened for editing` });
@@ -231,11 +243,31 @@ export const openExplorerController = async (req: Request, res: Response) => {
 export const runFileController = async (req: Request, res: Response) => {
   try {
     const { path } = req.body;
-    console.log(path,'runFileController')
+    console.log(path, 'runFileController')
     open_file(path); // your existing logic
     res.json({ success: true, path });
   } catch (err) {
     console.error("runFileController error:", err);
+    res.status(500).json({ success: false, error: "Failed to open file" });
+  }
+};
+
+
+
+export const transferContent = async (req: Request, res: Response) => {
+  try {
+    const { list } = req.body;
+    console.log('transferContent',list)
+    if(list.length != 0) runTransfer(list, SETTINGS_CONFIG.pathology.destDir).then(()=>{
+      res.status(200).end()
+    })
+    .catch((e)=>{
+      console.log(e)
+      res.status(404)
+    })
+    else res.status(404).end()
+  } catch (err) {
+    console.error("transferContent error:", err);
     res.status(500).json({ success: false, error: "Failed to open file" });
   }
 };

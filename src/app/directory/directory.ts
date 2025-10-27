@@ -3,6 +3,7 @@ import { SettingsTS } from '../interfaces/patients';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { Explorer } from '../services/explorer';
 
 @Component({
   selector: 'app-directory',
@@ -11,10 +12,10 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './directory.scss'
 })
 export class Directory {
-currentDirList = signal<string[]>([]);
-hotLinks = signal<{name:string,path:string,icon:string}[]>([])
+  currentDirList = signal<string[]>([]);
+  hotLinks = signal<{name:string,path:string,icon:string}[]>([])
   base!:string;
-  constructor(){
+  constructor(private explorer:Explorer){
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
       this.base = (<SettingsTS>JSON.parse(savedSettings)).archivePath ;
@@ -110,26 +111,10 @@ hotLinks = signal<{name:string,path:string,icon:string}[]>([])
       console.error('Failed to copy text: ', err);
     });
   }
-  openInExplorer(path:string){
-    this.http.post('/open_exp',{path})
-    .subscribe({
-      next:()=>{
-
-      },
-      error:()=>{
-        alert('Something went Wrong')
-      }
-    })
-  }
   runFile(path:string){
-    this.http.post('/open_file',{path})
-    .subscribe({
-      next:()=>{
-
-      },
-      error:()=>{
-        alert('Something went Wrong')
-      }
-    })
+    this.explorer.runFile(path)
+  }
+  openInExplorer(path:string){
+    this.explorer.openInExplorer(path)
   }
 }

@@ -18,7 +18,7 @@ export class Websocket {
     this.websocket.subscribe({
       next: msg => {
         console.log(msg)
-        if (msg.type === 'file_status') {
+        if (msg.type === 'file_status' || msg.type === 'transfer_status')  {
           this._notifications.next(msg); // just forward the notification
         }
       }, // Called whenever there is a message from the server.

@@ -36,3 +36,9 @@ export interface FileState {
 export interface extra extends FileState {
     target: 'stl'| 'dicom'
 }
+
+export interface TransferSocket {
+    path:string,
+    status:boolean,
+    type:'transfer_status'
+}

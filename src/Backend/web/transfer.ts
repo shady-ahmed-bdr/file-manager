@@ -1,12 +1,18 @@
 // copyAndRename.mjs
 import fs from 'fs/promises';
 import path from 'path';
+import { sendToClient } from './websocket';
 
-const [,, srcDir, endDir] = process.argv;
+import { access } from 'fs/promises';
+import { constants } from 'fs';
 
-if (!srcDir || !endDir) {
-	console.error('Usage: node copyAndRename.mjs <srcDir> <endDir>');
-	process.exit(1);
+async function pathExists(path:string) {
+  try {
+    await access(path, constants.F_OK); // Check existence
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 
@@ -20,6 +26,7 @@ async function hasPdf(folder:string) {
 }
 
 async function copyFiltered(src:string, dest:string) {
+	if(!(await pathExists(src)))throw new Error(' src not found');
 	const baseName = path.basename(src);
 	const reg = new RegExp('old', 'gi');
 	if (reg.test(baseName)) return;
@@ -28,11 +35,10 @@ async function copyFiltered(src:string, dest:string) {
 	const cleanName = baseName.replace(/done/gi, '').trim();
 
 	if (!cleanName || cleanName === '.' || cleanName === '..') {
-		console.warn('Skipped invalid or empty name:', src);
-		return;
+		throw new Error('Skipped invalid or empty name: '+ src);
 	}
 	const destPath = path.join(dest, cleanName);
-
+	console.log(destPath,'  ;;;;;;;;;;;;;;;',baseName,'111111111111', cleanName)
 	const stat = await fs.lstat(src);
 	if (stat.isDirectory()) {
 		await fs.mkdir(destPath, { recursive: true });
@@ -61,19 +67,26 @@ async function copyFiltered(src:string, dest:string) {
 	} else {
 		await fs.copyFile(src, destPath);
 	}
+	
 }
 
-async function run() {
+export async function runTransfer(srcDir:string[], endDir:string) {
+	if (srcDir.length == 0 || !endDir) {
+		console.log('1')
+		throw new Error(`Src or dest Not Found,  Src: ${srcDir},Dest: ${endDir}`);
+	}
 	await fs.mkdir(endDir, { recursive: true });
-	const items = await fs.readdir(srcDir);
-	for (const item of items) {
-		const from = path.join(srcDir, item);
-		await copyFiltered(from, endDir);
+	console.log('2')
+	for(const srcDirItem of srcDir){
+		console.log('3')
+		try{
+			console.log('444')
+			await copyFiltered(srcDirItem, endDir);
+			sendToClient({type:'transfer_status',path:srcDirItem,status:true})
+		}catch(err){
+			console.log('455544')
+			sendToClient({type:'transfer_status',path:srcDirItem,status:false})
+		}
 	}
 	console.log('Transfer complete.');
 }
-
-run().catch(err => {
-	console.error('Error:', err);
-	process.exit(1);
-});

@@ -56,3 +56,16 @@ export interface DirectoryWatcher {
   add(dir: DirectoryInfo): void;
   remove(path: string): void;
 }
+
+export interface HandleOptions {
+  patientFolder: string;   // full source folder path
+  serverListDir: string;   // full dest path (list folder)
+  checkbox: boolean;       // whether checkbox is selected
+  select?: string | null;  // selected scan name
+}
+
+export interface HandleResult {
+  status: 'ok' | 'error';
+  action?: string;
+  message?: string;
+}
