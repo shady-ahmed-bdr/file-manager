@@ -1,4 +1,5 @@
 import { exec, execFile, spawn, fork } from 'child_process';
+import path from 'path';
 
 
 export const open_in_paint = (imagePath: string) => {
@@ -29,3 +30,5 @@ export const copy_to_clipboard = (text:string)=> {
   proc.stdin.write(text);
   proc.stdin.end();
 }
+
+

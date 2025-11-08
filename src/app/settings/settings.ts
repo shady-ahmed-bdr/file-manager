@@ -23,7 +23,8 @@ export class Settings implements OnInit {
     pathology:{
       srcDir: '',
       destDir:''
-    }
+    },
+    activePtList: new Set()
   };
   private readonly localStorageKey = 'appSettings';
   constructor(private api:Api){}

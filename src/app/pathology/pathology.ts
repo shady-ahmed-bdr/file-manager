@@ -4,7 +4,10 @@ import { Update } from './update/update';
 import { Transfer } from './transfer/transfer';
 @Component({
   selector: 'app-pathology',
-  imports: [MatTabsModule, Update, Transfer],
+  imports: [
+    MatTabsModule, 
+    // Update, 
+    Transfer],
   templateUrl: './pathology.html',
   styleUrl: './pathology.scss'
 })

@@ -62,3 +62,14 @@ export async function unzipWithPassword(src: string, dest: string, password: str
 
   console.log("Extraction complete!");
 }
+
+
+
+export const moveToOldScan = async (targetDir:string) => {
+    const dirList =  fs.readdirSync(targetDir);
+    fs.mkdirSync(path.join(targetDir,'OLD SCAN'));
+    if(dirList.length > 10) return;
+    dirList.forEach((d)=>{
+        fs.renameSync(path.join(targetDir, d), path.join(targetDir, 'OLD SCAN', d))
+    })
+};

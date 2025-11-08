@@ -38,6 +38,7 @@
 
     <!-- File list -->
     <ul class="file-list">
+        <h2>Count( {{filteredList().length}} )</h2>
         @for (item of filteredList(); track $index) {
         <li class="file-row" (dblclick)="nav(item)">
             <div class="file-info" (click)="nav(item)"  >
@@ -56,6 +57,7 @@
                     <mat-icon class="icc" (click)="copy(paths.join('\\')+'\\'+item)">content_copy</mat-icon>
                     <mat-icon class="icc" (click)="openInExplorer(paths.join('\\')+'\\'+item)">folder_open</mat-icon>
                 }
+                <mat-icon class="icc" (click)="activeWorkDir(paths.join('\\')+'\\'+item)">star</mat-icon>
             </div>
         </li>
         }

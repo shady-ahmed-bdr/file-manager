@@ -33,6 +33,12 @@ export class Api {
   openImages(id:string){
     return this.http.get('/edit_images/'+id)
   }
+  openImagesPath(id:string){
+    return this.http.post('/edit_images_path',{id})
+  }
+  removeActivePt(src:string){
+    return this.http.post('/rm_pt/',{src})
+  }
 }
 
 /*

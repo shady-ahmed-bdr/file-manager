@@ -77,7 +77,24 @@
             }
         </div>
     </form>
-
+    <div class="work_dir_list">
+        @for (path of workList(); track $index) {
+            <li class="file-row">
+                <div class="file-info">
+                    <mat-icon class="file-icon">
+                        folder
+                    </mat-icon>
+                    <span class="file-name">{{ path.split('\\')[path.split('\\').length-1] }}</span>
+                </div>
+                <div class="icc_list">
+                    <mat-icon class="icc" (click)="copy(path)">content_copy</mat-icon>
+                    <mat-icon class="icc" (click)="openInExplorer(path)">folder_open</mat-icon>
+                    <mat-icon class="icc" (click)="editImgP(path)">photo</mat-icon>
+                    <mat-icon class="icc" (click)="rmDir(path)">delete</mat-icon>
+                </div>
+            </li>
+        }
+    </div>
     <div class="patient_list">
         @for(patient of PatientList(); track $index){
         <div class="patient">

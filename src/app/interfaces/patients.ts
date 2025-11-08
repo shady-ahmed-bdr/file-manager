@@ -26,6 +26,7 @@ export interface SettingsTS {
         srcDir:string,
         destDir:string
     }
+    activePtList: Set<string>
 }
 
 export interface FileState {

@@ -42,6 +42,7 @@ export interface SettingsTS {
     srcDir:string,
     destDir:string
   }
+  activePtList: string[]
 }
 
 

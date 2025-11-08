@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
-import { extra, FileState, Patient } from '../interfaces/patients';
+import { extra, FileState, Patient, SettingsTS } from '../interfaces/patients';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -8,6 +8,7 @@ import { Websocket } from '../services/websocket';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SendDialog } from './send-dialog/send-dialog';
+import { Explorer } from '../services/explorer';
 @Component({
   selector: 'app-manager',
   imports:
@@ -45,7 +46,17 @@ export class Manager implements OnInit {
       }
     })
   }
-  
+  editImgP(id:string){
+    this.api.openImagesPath(id).subscribe({
+      next:(res)=>{
+        
+      },
+      error:()=>{
+        alert('No images was found in Patient folder')
+      }
+    })
+  }
+  workList = signal<string[]>([])
   rr:string =''
   date: Date = new Date()
   month = String(this.date.getMonth() + 1).padStart(2, '0')
@@ -62,6 +73,11 @@ export class Manager implements OnInit {
   });
   PatientList = signal<Patient[]>([])
   ngOnInit(): void {
+    const settings =  localStorage.getItem('workSet')
+    if(settings){
+      const parsedST = (<string[]>JSON.parse(settings))
+      this.workList.set(parsedST)
+    }
     this.api.getList()
       .subscribe((data) => {
         this.PatientList.update((P) => {
@@ -81,7 +97,7 @@ export class Manager implements OnInit {
     });
     this.rr = this.api.settings.rrFolderPath
   }
-  constructor(private api: Api, private socket: Websocket) { }
+  constructor(private api: Api, private socket: Websocket,private explorer:Explorer) { }
   clear() {
     this.patient.set({
       name: '',
@@ -151,7 +167,12 @@ export class Manager implements OnInit {
       });
     }
   }
-
+  runFile(path:string){
+    this.explorer.runFile(path)
+  }
+  openInExplorer(path:string){
+    this.explorer.openInExplorer(path)
+  }
 
   private updateFileStatus(
     id: string,
@@ -223,6 +244,28 @@ export class Manager implements OnInit {
           alert('error')
         }
       })
+  }
+
+  rmDir(path:string){
+    this.api.removeActivePt(path)
+    .subscribe({
+      next:()=>{
+        const set = localStorage.getItem('workSet') ;
+        if(!set){
+            localStorage.setItem('workSet', JSON.stringify([...new Set()]))
+          }else{
+            const parsedSet:Set<string> = new Set(JSON.parse(set))
+            parsedSet.delete(path)
+            this.workList.update((arr)=>{
+              return [...parsedSet]
+            });
+            localStorage.setItem('workSet',JSON.stringify([...parsedSet]))
+          }
+      },
+      error:()=>{
+        alert('error removing the work Dir')
+      }
+    })
   }
 
   onSubmit(form: NgForm) {

@@ -12,10 +12,10 @@ import {
   handlePatientFolder
 } from '../models/patients';
 import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
-import { initNewDir, directSearch } from '../web/file-dir';
+import { initNewDir, directSearch, moveToOldScan } from '../web/file-dir';
 import { copyFile, extractZip, startWatching, terminateWatchers } from '../web/fs-watch';
-import { getDir } from '../models/dir-map';
-import { open_explorer, open_file, open_in_paint } from '../windows/child-one';
+import { getDir, } from '../models/dir-map';
+import {  open_explorer, open_file, open_in_paint } from '../windows/child-one';
 import { runTransfer } from '../web/transfer';
 
 export const removePatient = (req: Request, res: Response) => {
@@ -192,14 +192,36 @@ export const directory = (req: Request, res: Response) => {
 //   res.json(result);
 // };
 export const movePatient = async (req: Request, res: Response) => {
-   try { const { src, dest } = req.body; 
-   if (!src || !dest) { 
-    res.status(400).json({ error: 'src and dest are required' }); 
-    return; 
-  } const baseName = path.basename(src.trim()) 
-  await fs.cp(src.trim(), path.join(dest, baseName), { recursive: true }); 
-  res.json({ success: true, src, dest }); 
-  } catch (err: any) { console.error('Error copying folder:', err); res.status(500).json({ error: err.message }); } 
+  try {
+    const { src, dest,moveExisting,newFolderName } = req.body;
+    if (!src || !dest) {
+      res.status(400).json({ error: 'src and dest are required' });
+      return;
+    }
+    const dirList =  await fs.readdir(dest);
+   
+    const baseName = path.basename(src.trim())
+    if(moveExisting && !newFolderName){
+      if(dirList.length > 15) {
+        res.status(403).json({ error: 'bad folder' })
+        return;
+      };
+      await moveToOldScan(dest)
+      await fs.cp(src.trim(), path.join(dest, 'NEW SCAN'), { recursive: true });
+    }else if(moveExisting && newFolderName){
+      if(dirList.length > 15) {
+        res.status(403).json({ error: 'bad folder' })
+        return;
+      };
+      await moveToOldScan(dest)
+      await fs.cp(src.trim(), path.join(dest, newFolderName), { recursive: true });
+    }else if(newFolderName){
+      await fs.cp(src.trim(), path.join(dest, newFolderName), { recursive: true });
+    }else{
+      await fs.cp(src.trim(), path.join(dest, baseName), { recursive: true });
+    }
+    res.json({ success: true, src, dest });
+  } catch (err: any) { console.error('Error copying folder:', err); res.status(500).json({ error: err.message }); }
 }
 
 
@@ -211,9 +233,14 @@ export const editImagesPatient = async (req: Request, res: Response) => {
       .then((patient) => {
         const PtFolderPath = path.join(SETTINGS_CONFIG.rrFolderPath, patient.name)
         fs.readdir(PtFolderPath).then((dir) => {
-          dir.filter((s) => s.toLowerCase().endsWith('.png') || s.toLowerCase().endsWith('.jpeg')).forEach((p) => {
-            open_in_paint(path.join(PtFolderPath, p));
-          })
+          dir.filter((s) =>
+            s.toLowerCase().endsWith('.png')
+            ||
+            s.toLowerCase().endsWith('.jpeg')
+            ||
+            s.toLowerCase().endsWith('.jpg')).forEach((p) => {
+              open_in_paint(path.join(PtFolderPath, p));
+            })
         })
 
       }).catch((e) => {
@@ -226,6 +253,29 @@ export const editImagesPatient = async (req: Request, res: Response) => {
   }
 }
 
+export const editImagesPatientP = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.body;
+    const PtFolderPath = path.join(id);
+
+    const dir = await fs.readdir(PtFolderPath);
+    const images = dir.filter(
+      (s) => s.toLowerCase().endsWith('.png')
+        ||
+        s.toLowerCase().endsWith('.jpeg')
+        ||
+        s.toLowerCase().endsWith('.jpg')
+    );
+
+    for (const p of images) {
+      open_in_paint(path.join(PtFolderPath, p)); // if it's sync, remove await
+    }
+    res.json({ success: true, message: `Image(s) from ${id} opened for editing` });
+  } catch (err) {
+    console.error('Error opening image:', err);
+    res.status(500).json({ success: false, error: 'Failed to open image' });
+  }
+};
 
 
 export const openExplorerController = async (req: Request, res: Response) => {
@@ -257,17 +307,56 @@ export const runFileController = async (req: Request, res: Response) => {
 export const transferContent = async (req: Request, res: Response) => {
   try {
     const { list } = req.body;
-    console.log('transferContent',list)
-    if(list.length != 0) runTransfer(list, SETTINGS_CONFIG.pathology.destDir).then(()=>{
+    console.log('transferContent', list)
+    if (list.length != 0) runTransfer(list, SETTINGS_CONFIG.pathology.destDir).then(() => {
       res.status(200).end()
     })
-    .catch((e)=>{
-      console.log(e)
-      res.status(404)
-    })
+      .catch((e) => {
+        console.log(e)
+        res.status(404)
+      })
     else res.status(404).end()
   } catch (err) {
     console.error("transferContent error:", err);
     res.status(500).json({ success: false, error: "Failed to open file" });
   }
 };
+
+export const addWorkDir = async (req: Request, res: Response) => {
+  const { src }: { src: string } = req.body;
+  const stat = await fs.lstat(path.join(src))
+  if (!Array.isArray(SETTINGS_CONFIG.activePtList)) {
+    SETTINGS_CONFIG.activePtList = [];
+  }
+  const workSet = new Set(SETTINGS_CONFIG.activePtList)
+  console.log(workSet.has(src), stat.isDirectory())
+  if (!workSet.has(src) && stat.isDirectory()) {
+    workSet.add(src)
+    const newStt: SettingsTS = {
+      ...SETTINGS_CONFIG,
+      activePtList: [...workSet]
+    }
+    saveSettings(newStt)
+
+    res.status(200).json([...workSet])
+  } else (
+    res.status(400).json([])
+  )
+
+}
+
+export const rmWorkDir = async (req: Request, res: Response) => {
+  const { src } = req.body;
+  const workSet = new Set(SETTINGS_CONFIG.activePtList)
+  if (workSet.has(src)) {
+    workSet.delete(src)
+    const newStt: SettingsTS = {
+      ...SETTINGS_CONFIG,
+      activePtList: [...workSet]
+    }
+    saveSettings(newStt)
+    res.status(200).json(true)
+  } else (
+    res.status(400).json(false)
+  )
+}

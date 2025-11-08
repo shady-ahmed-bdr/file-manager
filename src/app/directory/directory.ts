@@ -117,4 +117,23 @@ export class Directory {
   openInExplorer(path:string){
     this.explorer.openInExplorer(path)
   }
+  activeWorkDir(path:string){
+    this.explorer.addActivePt(path).subscribe({
+      next:(b)=>{
+        if(b){
+          const set = localStorage.getItem('workSet') ;
+          if(!set){
+            localStorage.setItem('workSet', JSON.stringify([...new Set([path])]))
+          }else{
+            const parsedSet = new Set(JSON.parse(set))
+            parsedSet.add(path)
+            localStorage.setItem('workSet',JSON.stringify([...parsedSet]))
+          }
+        }
+      },
+      error:(err)=>{
+        alert(err)
+      }
+    })
+  }
 }

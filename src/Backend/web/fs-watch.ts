@@ -188,6 +188,34 @@ export const startWatching = () => {
           }
         }
       })
+      SETTINGS_CONFIG.activePtList.forEach((P) => {
+        const pLen = P.split('\\').length - 1
+        const pName = P.split('\\')[pLen].split(',')[0]
+        const keywords = pName.split(/[ \^]+/);
+        const regex = new RegExp(keywords.join('|'), "i")
+        const base = filename.split('.')[0]
+        console.log(pName, keywords, regex, base, 'baseeeeeeee')
+        if (filename.endsWith('.png') || filename.endsWith('.jpeg') || filename.endsWith('.jpg') || filename.endsWith('.PNG')) {
+          if (regex.test(base)) {
+            const src = path.join(SETTINGS_CONFIG.imagesWatchPath, filename);
+            const dest = path.join(P);
+            console.log('src: ',fs.existsSync(src),'dest: ',fs.existsSync(dest))
+            console.log('src: ',src,'dest: ',dest)
+            try{
+              setTimeout(()=>{
+                exportAssets(src, dest).then((path) => {
+                fs.unlinkSync(src)
+                }).catch((ee)=>{
+                  console.log(ee)
+                })
+              },1000)
+            }catch(e){
+              console.log(e)
+            }
+            
+          }
+        }
+      })
     })
   }
 };

@@ -11,6 +11,9 @@ import {
   openExplorerController,
   runFileController,
   transferContent,
+  addWorkDir,
+  rmWorkDir,
+  editImagesPatientP
 } from '../controllers/patientController';
 
 export const router = Router();
@@ -21,8 +24,11 @@ router.patch('/update', updatePatient);
 router.get('/list', getList);
 router.post('/settings', setSettings); 
 router.post('/path', directory)
+router.post('/edit_images_path', editImagesPatientP)
 router.patch('/p_folder',movePatient)
 router.get('/edit_images/:id', editImagesPatient)
 router.post('/open_exp', openExplorerController)
 router.post('/open_file', runFileController)
 router.post('/transfer', transferContent)
+router.post('/active_pt', addWorkDir)
+router.post('/rm_pt', rmWorkDir)

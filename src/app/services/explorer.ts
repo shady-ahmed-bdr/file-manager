@@ -28,4 +28,7 @@ export class Explorer {
       }
     })
   }
+  addActivePt(src:string){
+    return this.http.post<boolean>('/active_pt',{src})
+  }
 }
