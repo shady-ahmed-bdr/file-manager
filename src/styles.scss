@@ -43,6 +43,9 @@ html {
     pagination-icon-color: #fff,
     label-text-weight: 600
   ));
+  @include mat.checkbox-overrides((
+    label-text-color:white
+  ));
 }
 body {
   // Default the application to a light color theme. This can be changed to

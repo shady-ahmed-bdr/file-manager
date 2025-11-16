@@ -362,53 +362,60 @@ export const rmWorkDir = async (req: Request, res: Response) => {
 }
 
 
-// export const sendFileOrFolder = async (req: Request, res: Response) => {
-//   try {
-//     const { src, dest, type, extract } = req.body;
-//     if (!src || !dest) {
-//       return res.status(400).json({ error: 'Missing src or dest' });
-//     }
+export const sendFileOrFolder = async (req: Request, res: Response) => {
+  try {
+    let { src, dest, type, extract } = req.body;
+    console.log(req.body, 'aaaaaaaa')
+    
+    if (!src || !dest) {
+      return res.status(400).json({ error: 'Missing src or dest' });
+    }
+    src = path.join(...src.replaceAll("\"","").split("\\")) ;
+    dest = path.join(...dest.replaceAll("\"","").split("\\"));
+    try {
+      const srcExists = fss.existsSync(src);
+      if (!srcExists) {
+        return res.status(404).json({ error: 'Source path does not exist' });
+      }
+      const targetDir = path.join(dest, 'OLD', type.toUpperCase());
 
-//     try {
-//       const srcExists = fss.existsSync(src);
-//       if (!srcExists) {
-//         return res.status(404).json({ error: 'Source path does not exist' });
-//       }
+      // 1️⃣ If type is NONE or ARCHIVE → just copy (no folder creation)
+      if (type === 'none') {
+        const fileName = path.basename(src);
+        copyFileSender(src, dest, fileName);
+        console.log(fileName.toLowerCase().endsWith('.zip'))
+        if (extract && fileName.toLowerCase().endsWith('.zip')) {
+          await extractZipSender(src, dest);
+        }
+        return res.json({ success: true, message: 'Copied successfully' });
+      }
 
-//       // 1️⃣ If type is NONE or ARCHIVE → just copy (no folder creation)
-//       if (type === 'none' || type === 'archive') {
-//         const fileName = path.basename(src);
-//         copyFileSender(src, dest, fileName);
-//         return res.json({ success: true, message: 'Copied successfully' });
-//       }
+      // 2️⃣ For STL or DICOM → go inside OLD/... and manage extraction
 
-//       // 2️⃣ For STL or DICOM → go inside OLD/... and manage extraction
-//       const targetDir = path.join(dest, 'OLD', type.toUpperCase());
+      if (!fss.existsSync(targetDir)) {
+        fss.mkdirSync(targetDir, { recursive: true });
+      }
 
-//       if (!fss.existsSync(targetDir)) {
-//         fss.mkdirSync(targetDir, { recursive: true });
-//       }
+      const fileName = path.basename(src);
+      const finalDest = path.join(targetDir, fileName);
 
-//       const fileName = path.basename(src);
-//       const finalDest = path.join(targetDir, fileName);
+      // If it's a ZIP and extract is checked → unzip
+      if (extract && fileName.toLowerCase().endsWith('.zip')) {
+        await extractZipSender(src, targetDir);
+      }
 
-//       // If it's a ZIP and extract is checked → unzip
-//       if (extract && fileName.toLowerCase().endsWith('.zip')) {
-//         await extractZipSender(src, targetDir);
-//         return res.json({ success: true, message: 'Extracted successfully' });
-//       }
+      // Otherwise just copy
+      copyFileSender(src, targetDir, fileName);
+      return res.json({ success: true, message: 'Copied successfully' });
 
-//       // Otherwise just copy
-//       copyFileSender(src, targetDir, fileName);
-//       res.json({ success: true, message: 'Copied successfully' });
-
-//     } catch (err:any) {
-//       console.error('Send file error:', err);
-//       res.status(500).json({ error: err.message });
-//     }
+    } catch (err:any) {
+      console.error('Send file error:', err);
+      return res.status(500).json({ error: err.message });
+    }
 
 
-//   } catch (err) {
-
-//   }
-// }
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ error: err });
+  }
+}
