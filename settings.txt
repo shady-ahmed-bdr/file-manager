@@ -12,5 +12,8 @@
   "pathology": {
     "srcDir": "D:\\new",
     "destDir": "D:\\nnnn"
-  }
+  },
+  "activePtList": [
+    "C:\\Users\\shady\\Documents\\study_folder_js\\openGl"
+  ]
 }

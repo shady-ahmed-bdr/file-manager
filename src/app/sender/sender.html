@@ -1,1 +1,47 @@
-<p>sender works!</p>
+<div class="sender-container">
+  <div class="top-half">
+    <div class="sender-form">
+      <h3>Sender</h3>
+      <form (ngSubmit)="sendFile()">
+        <label>Source Path</label>
+        <input type="text" [(ngModel)]="src" name="src" required />
+
+        <label>Destination Path</label>
+        <input type="text" [(ngModel)]="dest" name="dest" required />
+
+        <label>Send As</label>
+        <select [(ngModel)]="sendType" name="sendType">
+          <option value="none">None</option>
+          <option value="archive">Archive</option>
+          <option value="stl">STL</option>
+          <option value="dicom">DICOM</option>
+        </select>
+
+        <button [disabled]="!src && !dest" type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="bottom-half">
+    <div class="col">
+      <h4>Server Patients</h4>
+      <ul>
+        @for (p of workingA; track $index) {
+        <li (click)="copyToDest(p)">
+          {{ p }}
+        </li>
+        }
+      </ul>
+    </div>
+    <div class="col">
+      <h4>RR Patients</h4>
+      <ul>
+        @for (p of workingB; track $index) {
+          <li (click)="copyToDest(pathRR.rrFolderPath+'\\'+p.name)">
+            {{ p.name }}
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>

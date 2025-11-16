@@ -13,7 +13,8 @@ import {
   transferContent,
   addWorkDir,
   rmWorkDir,
-  editImagesPatientP
+  editImagesPatientP,
+  sendFileOrFolder
 } from '../controllers/patientController';
 
 export const router = Router();
@@ -32,3 +33,4 @@ router.post('/open_file', runFileController)
 router.post('/transfer', transferContent)
 router.post('/active_pt', addWorkDir)
 router.post('/rm_pt', rmWorkDir)
+router.post('/sender', sendFileOrFolder)

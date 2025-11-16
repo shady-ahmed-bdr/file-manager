@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs/promises';
-
+import * as fss from  'fs'
 import { Patient, SettingsTS } from '../interfaces/websocket';
 import {
   addP,
@@ -13,9 +13,9 @@ import {
 } from '../models/patients';
 import { SETTINGS_CONFIG, saveSettings } from '../models/settings';
 import { initNewDir, directSearch, moveToOldScan } from '../web/file-dir';
-import { copyFile, extractZip, startWatching, terminateWatchers } from '../web/fs-watch';
+import { copyFile, copyFileSender, extractZip, extractZipSender, startWatching, terminateWatchers } from '../web/fs-watch';
 import { getDir, } from '../models/dir-map';
-import {  open_explorer, open_file, open_in_paint } from '../windows/child-one';
+import { open_explorer, open_file, open_in_paint } from '../windows/child-one';
 import { runTransfer } from '../web/transfer';
 
 export const removePatient = (req: Request, res: Response) => {
@@ -193,31 +193,31 @@ export const directory = (req: Request, res: Response) => {
 // };
 export const movePatient = async (req: Request, res: Response) => {
   try {
-    const { src, dest,moveExisting,newFolderName } = req.body;
+    const { src, dest, moveExisting, newFolderName } = req.body;
     if (!src || !dest) {
       res.status(400).json({ error: 'src and dest are required' });
       return;
     }
-    const dirList =  await fs.readdir(dest);
-   
+    const dirList = await fs.readdir(dest);
+
     const baseName = path.basename(src.trim())
-    if(moveExisting && !newFolderName){
-      if(dirList.length > 15) {
+    if (moveExisting && !newFolderName) {
+      if (dirList.length > 15) {
         res.status(403).json({ error: 'bad folder' })
         return;
       };
       await moveToOldScan(dest)
       await fs.cp(src.trim(), path.join(dest, 'NEW SCAN'), { recursive: true });
-    }else if(moveExisting && newFolderName){
-      if(dirList.length > 15) {
+    } else if (moveExisting && newFolderName) {
+      if (dirList.length > 15) {
         res.status(403).json({ error: 'bad folder' })
         return;
       };
       await moveToOldScan(dest)
       await fs.cp(src.trim(), path.join(dest, newFolderName), { recursive: true });
-    }else if(newFolderName){
+    } else if (newFolderName) {
       await fs.cp(src.trim(), path.join(dest, newFolderName), { recursive: true });
-    }else{
+    } else {
       await fs.cp(src.trim(), path.join(dest, baseName), { recursive: true });
     }
     res.json({ success: true, src, dest });
@@ -360,3 +360,55 @@ export const rmWorkDir = async (req: Request, res: Response) => {
     res.status(400).json(false)
   )
 }
+
+
+// export const sendFileOrFolder = async (req: Request, res: Response) => {
+//   try {
+//     const { src, dest, type, extract } = req.body;
+//     if (!src || !dest) {
+//       return res.status(400).json({ error: 'Missing src or dest' });
+//     }
+
+//     try {
+//       const srcExists = fss.existsSync(src);
+//       if (!srcExists) {
+//         return res.status(404).json({ error: 'Source path does not exist' });
+//       }
+
+//       // 1️⃣ If type is NONE or ARCHIVE → just copy (no folder creation)
+//       if (type === 'none' || type === 'archive') {
+//         const fileName = path.basename(src);
+//         copyFileSender(src, dest, fileName);
+//         return res.json({ success: true, message: 'Copied successfully' });
+//       }
+
+//       // 2️⃣ For STL or DICOM → go inside OLD/... and manage extraction
+//       const targetDir = path.join(dest, 'OLD', type.toUpperCase());
+
+//       if (!fss.existsSync(targetDir)) {
+//         fss.mkdirSync(targetDir, { recursive: true });
+//       }
+
+//       const fileName = path.basename(src);
+//       const finalDest = path.join(targetDir, fileName);
+
+//       // If it's a ZIP and extract is checked → unzip
+//       if (extract && fileName.toLowerCase().endsWith('.zip')) {
+//         await extractZipSender(src, targetDir);
+//         return res.json({ success: true, message: 'Extracted successfully' });
+//       }
+
+//       // Otherwise just copy
+//       copyFileSender(src, targetDir, fileName);
+//       res.json({ success: true, message: 'Copied successfully' });
+
+//     } catch (err:any) {
+//       console.error('Send file error:', err);
+//       res.status(500).json({ error: err.message });
+//     }
+
+
+//   } catch (err) {
+
+//   }
+// }

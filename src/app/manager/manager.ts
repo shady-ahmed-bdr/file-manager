@@ -79,12 +79,12 @@ export class Manager implements OnInit {
       this.workList.set(parsedST)
     }
     this.api.getList()
-      .subscribe((data) => {
-        this.PatientList.update((P) => {
-          console.log(data)
-          return data
-        })
+    .subscribe((data) => {
+      this.PatientList.update((P) => {
+        console.log(data)
+        return data
       })
+    })
     this.socket.notifications$.subscribe((msg) => {
       if (msg && msg.type === 'file_status') {
         this.updateFileStatus(

@@ -42,6 +42,45 @@ export async function extractZip(
   }
 }
 
+
+
+export async function extractZipSender(
+  filePath: string,
+  destDir: string,
+) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error('path no exists')
+  }
+  try {
+    await fs.createReadStream(filePath)
+      .pipe(unzipper.Extract({ path: destDir }))
+      .promise();
+  } catch (error) {
+    console.error(`Unzip error:`, error);
+    unzipWithPassword(filePath,destDir,'ewoo3ddx')
+  }
+}
+
+export const copyFileSender = (src: string, dest: string, fileName: string) => {
+  const srcPath = src;
+  const destPath = path.join(dest, fileName);
+  const dir = path.dirname(destPath);
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const stats = fs.statSync(srcPath);
+    if (stats.isDirectory()) {
+      fs.cpSync(srcPath, destPath, { recursive: true, force: false });
+    } else {
+      fs.copyFileSync(srcPath, destPath, fs.constants.COPYFILE_EXCL);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
 function notify(fileType: 'STL_File_LIST' | 'DICOM_FILE_LIST' | 'extra', fileName: string, status: Status, id: string) {
   sendToClient({
     type: 'file_status',
