@@ -1,19 +1,17 @@
 {
-  "downFolderPath": "C:\\Users\\shady\\Downloads",
-  "rrFolderPath": "D:\\RR",
+  "downFolderPath": "C:\\Users\\pc\\Downloads",
+  "rrFolderPath": "E:\\RR",
   "deleteAfterExtract": false,
   "createStlAndDicomWhenTpDone": false,
   "checkStlInDicom": false,
   "createNewPatientFolder": false,
   "deletePatientFolderInRR": false,
-  "archivePath": "C:\\Users\\shady\\Documents",
+  "archivePath": "C:\\Users\\pc\\Documents",
   "cafWatchPath": "",
-  "imagesWatchPath": "D:\\imgs",
+  "imagesWatchPath": "E:\\imgs",
   "pathology": {
-    "srcDir": "D:\\new",
-    "destDir": "D:\\nnnn"
+    "srcDir": "E:\\new",
+    "destDir": "E:\\nnnn"
   },
-  "activePtList": [
-    "C:\\Users\\shady\\Documents\\study_folder_js\\openGl"
-  ]
+  "activePtList": []
 }

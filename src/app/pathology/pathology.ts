@@ -6,7 +6,7 @@ import { Transfer } from './transfer/transfer';
   selector: 'app-pathology',
   imports: [
     MatTabsModule, 
-    Update,
+    // Update,
     Transfer],
   templateUrl: './pathology.html',
   styleUrl: './pathology.scss'

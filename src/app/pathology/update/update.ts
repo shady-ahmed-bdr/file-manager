@@ -21,14 +21,7 @@ export class Update {
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
       this.base = (<SettingsTS>JSON.parse(savedSettings)).pathology.destDir ;
-      this.hotLinks.update((r)=>{
-        const settings = (<SettingsTS>JSON.parse(savedSettings))
-        const keys:any = [];
-        if(settings && settings.pathology.srcDir)keys.push({ name: 'src', path: settings.pathology.srcDir, icon: 'computer' })
-        if(settings && settings.pathology.destDir)keys.push({ name: 'Drive', path: settings.pathology.destDir, icon: 'cloud' })
-        r = [...keys] 
-        return r
-      })
+
       this.paths[0] = this.base
       this.nav()
     }
@@ -36,7 +29,6 @@ export class Update {
 
   selectedForupdate:Set<string> = new Set()
   currentDirList = signal<{path:string,selected:boolean}[]>([]);
-  hotLinks = signal<{name:string,path:string,icon:string}[]>([])
   base!:string;
   paths:string[] = []
   selectFn(path:string,order:boolean){

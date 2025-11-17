@@ -14,17 +14,7 @@
                 <mat-icon (click)="copy(paths.join('\\'))">content_copy</mat-icon>
             </div>
         </div>
-        <div class="center-side">
-            <div class="hot-links">
-                <span class="hot-links-label">Quick Access:</span>
-                @for (link of hotLinks(); track link.name) {
-                    <a class="hot-link" [class.active]="link.path === paths[0]" (click)="newDir(link.path)">
-                        <mat-icon>{{ link.icon }}</mat-icon>
-                        {{ link.name }}
-                    </a>
-                }
-            </div>
-        </div>
+        
         <div class="left-side">
             <input type="text" placeholder="Search (regex)" [(ngModel)]="searchQuery" />
             @if(searchQuery){
