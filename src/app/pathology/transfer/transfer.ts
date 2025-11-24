@@ -5,14 +5,17 @@ import { Explorer } from '../../services/explorer';
 import { SettingsTS, TransferSocket } from '../../interfaces/patients';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
 import { Websocket } from '../../services/websocket';
-
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-transfer',
   imports: [
     MatIconModule,
     FormsModule,
-    MatCheckboxModule
+    MatCheckboxModule, 
+    RouterLink,
+    MatButtonModule
   ],
   templateUrl: './transfer.html',
   styleUrl: './transfer.scss'

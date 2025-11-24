@@ -1,6 +1,10 @@
 *{
     color: white;
 }
+.back{
+    margin: 25px;
+}
+
 .directory {
     padding: 1rem 2rem;
     background: #1c1c28;
@@ -225,7 +229,7 @@
     }
 }
 
-button[mat-flat-button] {
+button[mat-flat-button]:not(.back) {
     background: linear-gradient(90deg, #3498db, #6c63ff);
     color: #fff;
     padding: 0.55rem 1.2rem;
