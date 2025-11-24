@@ -5,13 +5,17 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { SettingsTS } from '../../interfaces/patients';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-update',
   imports: [
     MatIconModule,
     FormsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    RouterLink,
+    MatButtonModule
   ],
   templateUrl: './update.html',
   styleUrl: './update.scss'

@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
-import {MatTabsModule} from '@angular/material/tabs';
-import { Update } from './update/update';
-import { Transfer } from './transfer/transfer';
+
+import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-pathology',
   imports: [
-    MatTabsModule, 
-    // Update,
-    Transfer],
+    RouterOutlet
+  ],
   templateUrl: './pathology.html',
   styleUrl: './pathology.scss'
 })
