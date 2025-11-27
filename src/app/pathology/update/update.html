@@ -2,8 +2,19 @@
   Back
   <mat-icon>arrow_back</mat-icon>
 </button>
-
 <div class="container">
-    <label for="txt_area"></label>
-    <textarea name="code_list" id="txt_area"></textarea>
+  <textarea name="code_list" id="txt_area" placeholder="Case list" [(ngModel)]="caseList"></textarea>
+  <div class="start_btn">
+    <button class="back" mat-flat-button routerLink="/pathology">
+      Update
+      <mat-icon>update</mat-icon>
+    </button>
+  </div>
+  <div class="cmd-box">
+    @for (msg of messages; track $index) {
+      <div class="line" >
+        {{ msg }}
+      </div>
+    }
+  </div>
 </div>

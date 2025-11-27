@@ -89,12 +89,15 @@ async function main(casesList:string[]) {
 		C(cases, 'on Patch:', item,' (', len,'/',total,')');
 		notFound = [];
 		for (const caseNum of cases) {
+
 			const srcFolderitem = path.join(originalRoot, item);
-			const srcFolder = path.join(srcFolderitem, `${caseNum} Done`);
-			const destFolder = path.join(modifiedRoot, caseNum);
-			const srcExists = await fs.access(srcFolder).then(() => true).catch(() => false);
-			const destExists = await fs.access(destFolder).then(() => true).catch(() => false);
-			if (!srcExists || !destExists) {
+			const caseTarget = await findInDirr(srcFolderitem, caseNum)
+			const srcFolder = path.join(srcFolderitem, caseTarget);
+
+			const destCaseTarget = await findInDirr(modifiedRoot, caseNum)
+			const destFolder = path.join(modifiedRoot, destCaseTarget);
+
+			if (!caseTarget || !destCaseTarget) {
 				console.warn(`Skipping case ${caseNum} → source or destination not found on patch ${item}.`);
 				notFound.push(caseNum);
 			}else{
@@ -121,3 +124,9 @@ async function main(casesList:string[]) {
 	C('✅ Sync complete.');
 }
 
+
+const  findInDirr = async (str:string, target:string)=>{
+	const strList = await fs.readdir(str);
+	const targetRegex  = new RegExp(target)
+	return strList.find( path => targetRegex.test(path)) || ''
+}
