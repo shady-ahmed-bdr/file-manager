@@ -21,6 +21,16 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './update.scss'
 })
 export class Update {
+  caseList = '';
+  messages:string[]=['sasdasd']
+  transformTextArea(){
+    let init=  this.caseList.split("\n")
+    console.log(init)
+    return init
+  }
+
+
+
   constructor(private explorer:Explorer,private http:HttpClient){
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
