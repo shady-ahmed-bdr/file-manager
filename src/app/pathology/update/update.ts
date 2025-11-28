@@ -24,11 +24,11 @@ export class Update {
   caseList = '';
   messages:string[]=['sasdasd']
   transformTextArea(){
-    let init=  this.caseList.split("\n")
+    let init=  this.caseList.split("\n").filter((r)=>r != '')
     console.log(init)
     return init
   }
-
+  missingCasses = signal<string[]>(['213654'])
 
 
   constructor(private explorer:Explorer,private http:HttpClient){
@@ -137,15 +137,7 @@ export class Update {
       console.error('Failed to copy text: ', err);
     });
   }
-  cpWithQ(text: string){
-    navigator.clipboard.writeText('"'+text+'"')
-    .then(() => {
-      console.log('Text copied to clipboard:', text);
-    })
-    .catch(err => {
-      console.error('Failed to copy text: ', err);
-    });
-  }
+
   runFile(path:string){
     this.explorer.runFile(path)
   }
