@@ -5,7 +5,7 @@
 <div class="container">
   <textarea name="code_list" id="txt_area" placeholder="Case list" [(ngModel)]="caseList"></textarea>
   <div class="start_btn">
-    <button class="back" mat-flat-button routerLink="/pathology">
+    <button class="back" mat-flat-button (click)="transformTextArea()">
       Update
       <mat-icon>update</mat-icon>
     </button>
@@ -14,6 +14,15 @@
     @for (msg of messages; track $index) {
       <div class="line" >
         {{ msg }}
+      </div>
+    }
+  </div>
+  <div class="failed_cases">
+    @for (item of missingCasses(); track $index) {
+      <div class="case">
+        <div class="name">{{item}}</div>
+        <div class="src"></div>
+        <div class="dest"></div>
       </div>
     }
   </div>
