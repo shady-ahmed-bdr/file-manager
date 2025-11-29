@@ -18,11 +18,35 @@
     }
   </div>
   <div class="failed_cases">
+    <h2>Failed Case (id + src + dest)</h2>
+    
     @for (item of missingCasses(); track $index) {
       <div class="case">
-        <div class="name">{{item}}</div>
-        <div class="src"></div>
-        <div class="dest"></div>
+        <div class="name">ID: {{item.id}}</div>
+        <div class="src"> 
+          @if(item.src){
+            Exists!  
+            <mat-icon>content_copy</mat-icon>
+            <mat-icon>folder</mat-icon>
+          }@else{
+            <button class="back" mat-flat-button >
+              Locate
+              <mat-icon>find</mat-icon>
+            </button>
+          }
+        </div>
+        <div class="dest">
+          @if(!item.src){
+            Exists!  
+            <mat-icon>content_copy</mat-icon>
+            <mat-icon>folder</mat-icon>
+          }@else{
+            <button class="back" mat-flat-button >
+              Locate
+              <mat-icon>search</mat-icon>
+            </button>
+          }
+        </div>
       </div>
     }
   </div>
