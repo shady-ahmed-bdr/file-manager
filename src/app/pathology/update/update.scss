@@ -35,6 +35,36 @@ button.back {
     width: 95%;
     display: flex;
     margin: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    .case{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        margin: 4px;
+        padding: 7px 10px;
+        border: 1px solid red;
+        border-radius: 5px;
+        height: 65px;
+        mat-icon{
+            color: white;
+            cursor: pointer;
+            margin: 0 5px;
+            &:active{
+                color: lightblue;
+            }
+        }
+        button{
+            border-radius: 0;
+            color: white;
+            background-color: dodgerblue;
+        }
+        .src{
+            display: inherit;
+        }
+
+    }
 }
 
 

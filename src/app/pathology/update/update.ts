@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Explorer } from '../../services/explorer';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,8 @@ import { SettingsTS } from '../../interfaces/patients';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { PathDialog } from './path-dialog/path-dialog';
 
 @Component({
   selector: 'app-update',
@@ -15,12 +17,27 @@ import { MatButtonModule } from '@angular/material/button';
     FormsModule,
     MatCheckboxModule,
     RouterLink,
-    MatButtonModule
+    MatButtonModule,
+    MatDialogModule
   ],
   templateUrl: './update.html',
   styleUrl: './update.scss'
 })
 export class Update {
+  readonly dialog = inject(MatDialog);
+    openDialog(path:string) {
+      const dialogRef = this.dialog.open(PathDialog, {
+        data: {
+          path
+        },
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        console.log(`Dialog result: ${result}`);
+      });
+    }
+
+
+
   caseList = '';
   messages:string[]=['sasdasd']
   transformTextArea(){
@@ -28,7 +45,17 @@ export class Update {
     console.log(init)
     return init
   }
-  missingCasses = signal<string[]>(['213654'])
+  missingCasses = signal<{id:string; src:string;dest:string}[]>([
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+    {id:'12331', src:'12331',dest:'12331'},
+  ])
 
 
   constructor(private explorer:Explorer,private http:HttpClient){
