@@ -60,11 +60,18 @@ export class SendDialog {
       }
     })
   }
-
+  pathConstructor(){
+    let url = '';
+    this.paths.forEach((p)=>{
+      url+= p +'\\'
+    })
+    console.log(url.slice(0,url.length -1))
+    return url.slice(0, url.length -1)
+  }
   sendFolder() {
     const body = {
       src: this.data.path,
-      dest: this.paths.toString().replaceAll(',', '\\'),
+      dest: this.pathConstructor(),
       moveExisting: this.moveExisting,
       newFolderName: this.newFolderName
     };

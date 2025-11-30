@@ -29,7 +29,7 @@
             <mat-icon>content_copy</mat-icon>
             <mat-icon>folder</mat-icon>
           }@else{
-            <button class="back" mat-flat-button >
+            <button class="back" mat-flat-button  (click)="openDialog(pathologyPath.srcDir, item.id)">
               Locate
               <mat-icon>find</mat-icon>
             </button>
@@ -41,7 +41,7 @@
             <mat-icon>content_copy</mat-icon>
             <mat-icon>folder</mat-icon>
           }@else{
-            <button class="back" mat-flat-button >
+            <button class="back" mat-flat-button  (click)="openDialog(pathologyPath.destDir, item.id)">
               Locate
               <mat-icon>search</mat-icon>
             </button>

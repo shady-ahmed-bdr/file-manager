@@ -16,6 +16,25 @@
   border-radius: 6px;
   margin-bottom: 15px;
   font-size: 14px;
+  input{
+    width: 95%;
+    border: 1px solid dodgerblue;
+    border-radius: 7px;
+    padding: 5px;
+    outline: none;
+  }
+  mat-icon{
+    position: absolute;
+    top: 18px;
+    right: -1px;
+    scale: .5;
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    &:hover{
+      background-color: rgba(158, 158, 158, 0.518);
+    }
+  }
 }
 .dir-list {
   list-style: none;
