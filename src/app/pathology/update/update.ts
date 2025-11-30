@@ -24,20 +24,22 @@ import { PathDialog } from './path-dialog/path-dialog';
   styleUrl: './update.scss'
 })
 export class Update {
+
   readonly dialog = inject(MatDialog);
-    openDialog(path:string) {
-      const dialogRef = this.dialog.open(PathDialog, {
-        data: {
-          path
-        },
-      });
-      dialogRef.afterClosed().subscribe(result => {
-        console.log(`Dialog result: ${result}`);
-      });
-    }
+  openDialog(path:string,c:string) {
+    const dialogRef = this.dialog.open(PathDialog, {
+      data: {
+        path:path,
+        case:c
+      },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
 
 
-
+  pathologyPath:{srcDir:string,destDir:string} = {srcDir:'',destDir:''}
   caseList = '';
   messages:string[]=['sasdasd']
   transformTextArea(){

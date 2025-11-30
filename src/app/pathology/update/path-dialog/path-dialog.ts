@@ -11,6 +11,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 export interface DialogData {
   path: string
+  case:string
 }
 
 @Component({
@@ -31,6 +32,7 @@ export interface DialogData {
 export class PathDialog {
   moveExisting: boolean = false;
   newFolderName = '';
+  searchQuery:string = '';
   currentDirList = signal<string[]>([]);
   base!: string;
   constructor() {
@@ -59,23 +61,38 @@ export class PathDialog {
         alert('No sub directory found')
       }
     })
+    this.clearSearch()
   }
-
+  pathConstructor(){
+    let url = '';
+    this.paths.forEach((p)=>{
+      url+= p +'\\'
+    })
+    console.log(url.slice(0,url.length -1))
+    return url.slice(0, url.length -1)
+  }
   sendFolder() {
-    const body = {
-      src: this.data.path,
-      dest: this.paths.toString().replaceAll(',', '\\'),
-      moveExisting: this.moveExisting,
-      newFolderName: this.newFolderName
-    };
-    console.log(body)
-    this.http.patch('/p_folder', body).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: () => this.dialogRef.close(false)
-    });
+    this.pathConstructor()
+    this.dialogRef.close(this.pathConstructor())
   }
   backDir() {
     this.paths.pop()
     this.nav()
+    this.clearSearch()
+  }
+
+  filteredList(): string[] {
+    if (!this.searchQuery) return this.currentDirList();
+
+    try {
+      const regex = new RegExp(this.searchQuery, "i"); // case-insensitive
+      return this.currentDirList().filter(item => regex.test(item));
+    } catch (e) {
+      // invalid regex → return full list or empty
+      return this.currentDirList();
+    }
+  }
+  clearSearch(){
+    this.searchQuery = ''
   }
 }
