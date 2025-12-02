@@ -5,7 +5,7 @@
 <div class="container">
   <textarea name="code_list" id="txt_area" placeholder="Case list" [(ngModel)]="caseList"></textarea>
   <div class="start_btn">
-    <button class="back" mat-flat-button (click)="transformTextArea()">
+    <button class="back" mat-flat-button (click)="transformTextAreaAndUpdate()">
       Update
       <mat-icon>update</mat-icon>
     </button>
@@ -19,27 +19,26 @@
   </div>
   <div class="failed_cases">
     <h2>Failed Case (id + src + dest)</h2>
-    
     @for (item of missingCasses(); track $index) {
-      <div class="case">
+      <div class="case" [style.border-color]="item.state">
         <div class="name">ID: {{item.id}}</div>
         <div class="src"> 
           @if(item.src){
             Exists!  
-            <mat-icon>content_copy</mat-icon>
-            <mat-icon>folder</mat-icon>
+            <mat-icon (click)="copy(item.src)">content_copy</mat-icon>
+            <mat-icon (click)="openInExplorer(item.src)">folder</mat-icon>
           }@else{
             <button class="back" mat-flat-button  (click)="openDialog(pathologyPath.srcDir, item.id)">
               Locate
-              <mat-icon>find</mat-icon>
+              <mat-icon>searchw</mat-icon>
             </button>
           }
         </div>
         <div class="dest">
-          @if(!item.src){
+          @if(item.dest){
             Exists!  
-            <mat-icon>content_copy</mat-icon>
-            <mat-icon>folder</mat-icon>
+            <mat-icon (click)="copy(item.dest)">content_copy</mat-icon>
+            <mat-icon (click)="openInExplorer(item.dest)">folder</mat-icon>
           }@else{
             <button class="back" mat-flat-button  (click)="openDialog(pathologyPath.destDir, item.id)">
               Locate

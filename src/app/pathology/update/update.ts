@@ -24,7 +24,7 @@ import { PathDialog } from './path-dialog/path-dialog';
   styleUrl: './update.scss'
 })
 export class Update {
-
+  active:boolean = false;
   readonly dialog = inject(MatDialog);
   openDialog(path:string,c:string) {
     const dialogRef = this.dialog.open(PathDialog, {
@@ -42,21 +42,22 @@ export class Update {
   pathologyPath:{srcDir:string,destDir:string} = {srcDir:'',destDir:''}
   caseList = '';
   messages:string[]=['sasdasd']
-  transformTextArea(){
+  transformTextAreaAndUpdate(){
+    this.active = true
     let init=  this.caseList.split("\n").filter((r)=>r != '')
     console.log(init)
     return init
   }
-  missingCasses = signal<{id:string; src:string;dest:string}[]>([
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
-    {id:'12331', src:'12331',dest:'12331'},
+  missingCasses = signal<{id:string; src:string;dest:string,state:'red'| 'yellow'| 'green'}[]>([
+    {id:'12331', src:'12331',dest:'12331',state:'yellow'},
+    {id:'12331', src:'12331',dest:'12331',state:'red'},
+    {id:'12331', src:'12331',dest:'',state:'red'},
+    {id:'12331', src:'12331',dest:'12331',state:'red'},
+    {id:'12331', src:'12331',dest:'12331',state:'red'},
+    {id:'12331', src:'',dest:'12331',state:'red'},
+    {id:'12331', src:'12331',dest:'12331',state:'red'},
+    {id:'12331', src:'12331',dest:'12331',state:'red'},
+    {id:'12331', src:'12331',dest:'12331',state:'red'},
   ])
 
 
@@ -66,23 +67,6 @@ export class Update {
       this.pathologyPath = (<SettingsTS>JSON.parse(savedSettings)).pathology ;
     }
   }
-
-  
-
-  
-  
-
-  // searchQuery: string = "";
-  // filteredList(): {path:string,selected:boolean}[] {
-  //   if (!this.searchQuery) return this.currentDirList();
-  //   try {
-  //     const regex = new RegExp(this.searchQuery, "i"); // case-insensitive
-  //     return this.currentDirList().filter(item => regex.test(item.path));
-  //   } catch (e) {
-  //     // invalid regex → return full list or empty
-  //     return this.currentDirList();
-  //   }
-  // }
   
   copy(text: string) {
     navigator.clipboard.writeText(text)
@@ -94,10 +78,11 @@ export class Update {
     });
   }
 
-  runFile(path:string){
-    this.explorer.runFile(path)
-  }
   openInExplorer(path:string){
     this.explorer.openInExplorer(path)
+  }
+  reset(){
+    this.active = false;
+    this.missingCasses.set([])
   }
 }
