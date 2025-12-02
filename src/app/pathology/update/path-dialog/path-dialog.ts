@@ -38,7 +38,7 @@ export class PathDialog {
   constructor() {
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
-      this.base = (<SettingsTS>JSON.parse(savedSettings)).archivePath;
+      this.base = this.data.path;
       this.paths[0] = this.base
       this.nav()
     }
