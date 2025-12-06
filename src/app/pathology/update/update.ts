@@ -10,6 +10,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PathDialog } from './path-dialog/path-dialog';
 
+interface MC {
+  id:string; 
+  src:string;dest:string, 
+  state:'red'| 'yellow'| 'green'
+}
+
 @Component({
   selector: 'app-update',
   imports: [
@@ -44,11 +50,17 @@ export class Update {
   messages:string[]=['sasdasd']
   transformTextAreaAndUpdate(){
     this.active = true
-    let init=  this.caseList.split("\n").filter((r)=>r != '')
-    console.log(init)
-    return init
+    let list=  this.caseList.split("\n").filter((r)=>r != '')
+    console.log(list)
+    this.http.post<MC[]>('/update_cases',{list}).subscribe({
+      next:(res)=>{
+        this.missingCasses.set(res)
+      },
+      error:(err)=>alert(err)
+    })
+    return list
   }
-  missingCasses = signal<{id:string; src:string;dest:string,state:'red'| 'yellow'| 'green'}[]>([
+  missingCasses = signal<MC[]>([
     {id:'12331', src:'12331',dest:'12331',state:'yellow'},
     {id:'12331', src:'12331',dest:'12331',state:'red'},
     {id:'12331', src:'12331',dest:'',state:'red'},
