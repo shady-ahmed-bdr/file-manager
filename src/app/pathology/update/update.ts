@@ -50,29 +50,19 @@ export class Update {
   messages:string[]=['sasdasd']
   transformTextAreaAndUpdate(){
     this.active = true
-    let list=  this.caseList.split("\n").filter((r)=>r != '')
-    console.log(list)
-    this.http.post<MC[]>('/update_cases',{list}).subscribe({
+    let cases=  this.caseList.split("\n").filter((r)=>r != '')
+    console.log(cases)
+    this.http.post<MC[]>('/update_cases',{cases}).subscribe({
       next:(res)=>{
         this.missingCasses.set(res)
       },
       error:(err)=>alert(err)
     })
-    return list
+    return cases
   }
-  missingCasses = signal<MC[]>([
-    {id:'12331', src:'12331',dest:'12331',state:'yellow'},
-    {id:'12331', src:'12331',dest:'12331',state:'red'},
-    {id:'12331', src:'12331',dest:'',state:'red'},
-    {id:'12331', src:'12331',dest:'12331',state:'red'},
-    {id:'12331', src:'12331',dest:'12331',state:'red'},
-    {id:'12331', src:'',dest:'12331',state:'red'},
-    {id:'12331', src:'12331',dest:'12331',state:'red'},
-    {id:'12331', src:'12331',dest:'12331',state:'red'},
-    {id:'12331', src:'12331',dest:'12331',state:'red'},
-  ])
+  missingCasses = signal<MC[]>([])
 
-
+  
   constructor(private explorer:Explorer,private http:HttpClient){
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
