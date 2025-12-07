@@ -8,8 +8,10 @@ import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 })
 export class Websocket {
   private websocket!:WebSocketSubject<any>;
-   private _notifications = new BehaviorSubject<any | null>(null);
-   notifications$ = this._notifications.asObservable();
+
+  private _notifications = new BehaviorSubject<any | null>(null);
+  notifications$ = this._notifications.asObservable();
+  
   constructor(){
     this.websocket = webSocket('ws://localhost:4000/')
     this.initSocket();
