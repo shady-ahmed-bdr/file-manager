@@ -17,6 +17,7 @@ import { copyFile, copyFileSender, extractZip, extractZipSender, startWatching, 
 import { getDir, } from '../models/dir-map';
 import { open_explorer, open_file, open_in_paint } from '../windows/child-one';
 import { runTransfer } from '../web/transfer';
+import { updateProtocol } from '../web/update';
 
 export const removePatient = (req: Request, res: Response) => {
   const id = req.params['id'];
@@ -418,4 +419,11 @@ export const sendFileOrFolder = async (req: Request, res: Response) => {
     console.log(err)
     return res.status(500).json({ error: err });
   }
+}
+
+
+export const handleUpdateCases = async (req: Request, res: Response)=>{
+  const { list } = req.body;
+  updateProtocol(list, SETTINGS_CONFIG.pathology.srcDir,  SETTINGS_CONFIG.pathology.destDir)
+  res.status(200).end()
 }

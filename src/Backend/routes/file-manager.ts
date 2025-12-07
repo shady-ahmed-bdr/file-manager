@@ -14,7 +14,8 @@ import {
   addWorkDir,
   rmWorkDir,
   editImagesPatientP,
-  sendFileOrFolder
+  sendFileOrFolder,
+  handleUpdateCases
 } from '../controllers/patientController';
 
 export const router = Router();
@@ -34,3 +35,4 @@ router.post('/transfer', transferContent)
 router.post('/active_pt', addWorkDir)
 router.post('/rm_pt', rmWorkDir)
 router.post('/sender', sendFileOrFolder)
+router.post('/update_cases', handleUpdateCases)

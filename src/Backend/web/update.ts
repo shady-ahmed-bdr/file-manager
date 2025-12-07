@@ -3,21 +3,13 @@ import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const [,, caseListFile, originalRoot, modifiedRoot] = process.argv;
 
 
 const C = console.log
 
 
-if (!caseListFile || !originalRoot || !modifiedRoot) {
-	console.error('Usage: node syncCaseFolders.mjs <caseList.txt> <originalRoot> <modifiedRoot>');
-	process.exit(1);
-}
 
-async function readCaseNumbers(filePath:string) {
-	const raw = await fs.readFile(filePath, 'utf-8');
-	return raw.split(/\r?\n/).map(line => line.trim()).filter(line => line);
-}
+
 
 async function hasPdf(folder:string) {
 	try {
@@ -78,9 +70,8 @@ async function syncFolder(src:string, dest:string,caseNum:string) {
 		}
 	}
 }
-
-async function main(casesList:string[]) {
-	let cases = await readCaseNumbers(caseListFile);//
+								//SRC 					//DEST
+export async function updateProtocol(cases:string[],originalRoot:string, modifiedRoot:string) {
 	const items = await fs.readdir(originalRoot);
 	let len  = 1
 	const total = items.length
@@ -115,6 +106,7 @@ async function main(casesList:string[]) {
 			C('saving file in: ',`/log/${date}-log.txt`)
 			const loc = path.join(__dirname, `log/${date}-log.txt`);
 			fs.writeFile(loc,'not found: ' +notFound.toString().replaceAll(',','\n')+'\n'+'same file with no updates: '+ sameV.toString().replaceAll(',','\n'))
+			return notFound
 		}
 		cases = notFound;
 		notFound = []
@@ -122,6 +114,7 @@ async function main(casesList:string[]) {
 		C()
 	}
 	C('✅ Sync complete.');
+	return []
 }
 
 
