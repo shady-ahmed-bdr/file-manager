@@ -3,18 +3,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { Explorer } from '../../services/explorer';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { SettingsTS } from '../../interfaces/patients';
+import { MC, SettingsTS, updateSocket } from '../../interfaces/patients';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PathDialog } from './path-dialog/path-dialog';
+import { Websocket } from '../../services/websocket';
 
-interface MC {
-  id:string; 
-  src:string;dest:string, 
-  state:'red'| 'yellow'| 'green'
-}
+
 
 @Component({
   selector: 'app-update',
@@ -32,15 +29,24 @@ interface MC {
 export class Update {
   active:boolean = false;
   readonly dialog = inject(MatDialog);
-  openDialog(path:string,c:string) {
+  
+  openDialog(path:string,MC:MC, type:'src'|'dest') {
+    const obj ={ ...MC};
     const dialogRef = this.dialog.open(PathDialog, {
       data: {
         path:path,
-        case:c
+        case:MC
       },
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
+      if(type == 'src'){
+        obj.src = result;
+      }else{
+        obj.dest = result;
+      }
+      console.log(obj,'uuu')
+      this.updateSingleCase(obj.id,obj.src,obj.dest)
     });
   }
 
@@ -60,10 +66,25 @@ export class Update {
     })
     return cases
   }
-  missingCasses = signal<MC[]>([])
+  missingCasses = signal<MC[]>([
+    {dest: '', src:'dasda', id:';54654', state:'yellow'}
+  ])
 
   
-  constructor(private explorer:Explorer,private http:HttpClient){
+  constructor(private explorer:Explorer,private http:HttpClient, private ws:Websocket){
+    this.ws.notifications$.subscribe((msg: updateSocket)=>{
+      if(msg && msg.type == 'transfer_status'){
+        this.missingCasses.update((arr)=>{
+          arr = arr.map((C)=>{
+            if(C.id == msg.id){
+              C.state = msg.state
+            }
+            return C
+          })
+          return arr
+        })
+      }
+    })
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
       this.base = (<SettingsTS>JSON.parse(savedSettings)).pathology.destDir ;

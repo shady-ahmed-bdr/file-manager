@@ -43,3 +43,15 @@ export interface TransferSocket {
     status:boolean,
     type:'transfer_status'
 }
+export interface updateSocket {
+    type:'transfer_status'
+    id:string;
+    state:'red'| 'yellow'| 'green'
+}
+
+export interface MC {
+  id:string; 
+  src:string;
+  dest:string, 
+  state:'red'| 'yellow'| 'green'
+}
