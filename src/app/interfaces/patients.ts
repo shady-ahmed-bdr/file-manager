@@ -44,14 +44,18 @@ export interface TransferSocket {
     type:'transfer_status'
 }
 export interface updateSocket {
-    type:'transfer_status'
+    type:'transfer_status' | 'transfer_status_case'
     id:string;
     state:'red'| 'yellow'| 'green'
 }
+export interface updateSocketCase extends updateSocket {
+    src:string;
+    dest:string, 
+}
 
 export interface MC {
-  id:string; 
-  src:string;
-  dest:string, 
-  state:'red'| 'yellow'| 'green'
+    id:string; 
+    src:string;
+    dest:string, 
+    state:'red'| 'yellow'| 'green'
 }

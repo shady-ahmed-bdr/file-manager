@@ -21,7 +21,7 @@ async function hasPdf(folder:string) {
 }
 
 const sameV:string[] = [];
-async function syncFolder(src:string, dest:string,caseNum:string) {
+export async function syncFolder(src:string, dest:string,caseNum:string) {
 	const base = path.basename(src);
 	const regex = new RegExp('old','gi')
 	const Reg0000 = new RegExp('0000', 'g')
