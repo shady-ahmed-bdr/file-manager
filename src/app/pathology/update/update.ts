@@ -46,7 +46,7 @@ export class Update {
         obj.dest = result;
       }
       console.log(obj,'uuu')
-      this.updateSingleCase(obj.id,obj.src,obj.dest)
+      if(result) this.updateSingleCase(obj.id,obj.src,obj.dest)
     });
   }
 
@@ -58,12 +58,7 @@ export class Update {
     this.active = true
     let cases=  this.caseList.split("\n").filter((r)=>r != '')
     console.log(cases)
-    this.http.post<MC[]>('/update_cases',{cases}).subscribe({
-      next:(res)=>{
-        this.missingCasses.set(res)
-      },
-      error:(err)=>alert(err)
-    })
+    this.http.post('/update_cases',{cases}).subscribe()
     return cases
   }
   missingCasses = signal<MC[]>([
@@ -72,7 +67,7 @@ export class Update {
 
   
   constructor(private explorer:Explorer,private http:HttpClient, private ws:Websocket){
-    this.ws.notifications$.subscribe((msg: updateSocket)=>{
+    this.ws.notifications$.subscribe((msg: updateSocket )=>{
       if(msg && msg.type == 'transfer_status'){
         this.missingCasses.update((arr)=>{
           arr = arr.map((C)=>{
@@ -84,7 +79,14 @@ export class Update {
           return arr
         })
       }
+      if(msg && msg.type == 'transfer_status_case'){
+        this.missingCasses.update((arr)=>{
+          arr.push(msg as any)
+          return arr
+        })
+      }
     })
+    
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
       this.base = (<SettingsTS>JSON.parse(savedSettings)).pathology.destDir ;
