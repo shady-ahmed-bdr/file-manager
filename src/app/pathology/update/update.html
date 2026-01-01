@@ -1,74 +1,52 @@
-<div class="directory">
-
-    <div class="actions button-bar">
-        <div class="right-side">
-            <div class="path_container">
-                <div class="path-bar">
-                    @for (part of paths; track $index) {
-                        <a (click)="goTo($index)">{{ part }}</a>
-                        @if ($index < paths.length - 1) { 
-                            <span>\</span>
-                        }
-                    }
-                </div>
-                <mat-icon (click)="copy(paths.join('\\'))">content_copy</mat-icon>
-            </div>
-        </div>
-        <div class="center-side">
-            <div class="hot-links">
-                <span class="hot-links-label">Quick Access:</span>
-                @for (link of hotLinks(); track link.name) {
-                    <a class="hot-link" [class.active]="link.path === paths[0]" (click)="newDir(link.path)">
-                        <mat-icon>{{ link.icon }}</mat-icon>
-                        {{ link.name }}
-                    </a>
-                }
-            </div>
-        </div>
-        <div class="left-side">
-            <input type="text" placeholder="Search (regex)" [(ngModel)]="searchQuery" />
-            @if(searchQuery){
-                <span class="clear-icon" (click)="searchQuery = ''">×</span>
-            }
-            <button [disabled]="paths.length <= 1" mat-flat-button color="primary" (click)="backDir()">
-                <mat-icon>arrow_back</mat-icon> Back
+<button class="back" mat-flat-button routerLink="/pathology">
+  Back
+  <mat-icon>arrow_back</mat-icon>
+</button>
+<div class="container">
+  <textarea name="code_list" id="txt_area" placeholder="Case list" [(ngModel)]="caseList"></textarea>
+  <div class="start_btn">
+    <button class="back" mat-flat-button (click)="transformTextAreaAndUpdate()">
+      Update
+      <mat-icon>update</mat-icon>
+    </button>
+  </div>
+  <div class="cmd-box">
+    @for (msg of messages; track $index) {
+      <div class="line" >
+        {{ msg }}
+      </div>
+    }
+  </div>
+  <div class="failed_cases">
+    <h2>Failed Case (id + src + dest)</h2>
+    @for (item of missingCasses(); track $index) {
+      <div class="case" [style.border-color]="item.state">
+        <div class="name">ID: {{item.id}}</div>
+        <div class="src"> 
+          @if(item.src){
+            Exists!  
+            <mat-icon (click)="copy(item.src)">content_copy</mat-icon>
+            <mat-icon (click)="openInExplorer(item.src)">folder</mat-icon>
+          }@else{
+            <button class="back" mat-flat-button  (click)="openDialog(pathologyPath.srcDir, item, 'src')">
+              Locate
+              <mat-icon>searchw</mat-icon>
             </button>
+          }
         </div>
-    </div>
-
-    <!-- File list -->
-    <ul class="file-list">
-        @for (item of filteredList(); track $index) {
-        <li 
-        class="file-row" 
-        [class.active]="selectedForupdate.has(item.path)" 
-         
-        (dblclick)="nav(item.path)"
-        >
-            <div class="file-info"  >
-                <mat-checkbox 
-                [(ngModel)]="item.selected"
-                (click)="selectFn(item.path,item.selected)"
-                ></mat-checkbox>
-                <mat-icon 
-                (click)="nav(item.path)" 
-                 class="file-icon">
-                    {{ isFolder(item.path) ? 'folder' : 'description' }}
-                </mat-icon>
-                <span (click)="nav(item.path)" class="file-name">{{ item.path }}</span>
-            </div>
-            <div class="icc_list">
-                @if(!isFolder(item.path)){
-                    <mat-icon class="icc" (click)="cpWithQ(paths.join('\\')+'\\'+item.path)">content_copy</mat-icon>
-                    <mat-icon class="icc" (click)="runFile(paths.join('\\')+'\\'+item.path)">play_arrow</mat-icon>
-                    <mat-icon class="icc" (click)="openInExplorer(paths.join('\\'))">folder_open</mat-icon>
-                }
-                @if(isFolder(item.path)){
-                    <mat-icon class="icc" (click)="copy(paths.join('\\')+'\\'+item.path)">content_copy</mat-icon>
-                    <mat-icon class="icc" (click)="openInExplorer(paths.join('\\')+'\\'+item.path)">folder_open</mat-icon>
-                }
-            </div>
-        </li>
-        }
-    </ul>
+        <div class="dest">
+          @if(item.dest){
+            Exists!  
+            <mat-icon (click)="copy(item.dest)">content_copy</mat-icon>
+            <mat-icon (click)="openInExplorer(item.dest)">folder</mat-icon>
+          }@else{
+            <button class="back" mat-flat-button  (click)="openDialog(pathologyPath.destDir, item, 'dest')">
+              Locate
+              <mat-icon>search</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
 </div>

@@ -103,99 +103,22 @@ export class Update {
     
     const savedSettings = localStorage.getItem('appSettings');
     if (savedSettings) {
-      this.base = (<SettingsTS>JSON.parse(savedSettings)).pathology.destDir ;
-      this.hotLinks.update((r)=>{
-        const settings = (<SettingsTS>JSON.parse(savedSettings))
-        const keys:any = [];
-        if(settings && settings.pathology.srcDir)keys.push({ name: 'src', path: settings.pathology.srcDir, icon: 'computer' })
-        if(settings && settings.pathology.destDir)keys.push({ name: 'Drive', path: settings.pathology.destDir, icon: 'cloud' })
-        r = [...keys] 
-        return r
-      })
-      this.paths[0] = this.base
-      this.nav()
+      this.pathologyPath = (<SettingsTS>JSON.parse(savedSettings)).pathology ;
     }
   }
-
-  selectedForupdate:Set<string> = new Set()
-  currentDirList = signal<{path:string,selected:boolean}[]>([]);
-  hotLinks = signal<{name:string,path:string,icon:string}[]>([])
-  base!:string;
-  paths:string[] = []
-  selectFn(path:string,order:boolean){
-    if(order){
-      this.selectedForupdate.add(path)
-    }else{
-      this.selectedForupdate.delete(path)
-    }
-    localStorage.setItem('updateRecord', JSON.stringify([...this.selectedForupdate]))
-    console.log(this.selectedForupdate)
-  }
-  isFolder(name: string): boolean {
-    return !name.includes('.');
-  }
-  goTo(i:number){
-    const arr = this.paths.splice(0, i+1)
-    this.paths = arr
-    console.log(arr)
-    this.http.post<string[]>('/path/',arr).subscribe({
+  updateSingleCase(id:string, src: string, dest:string){
+    if(src&&dest) this.http.post<boolean>('/update_cases_item', {id, src, dest}).subscribe({
       next:(res)=>{
-        this.currentDirList.update((arr)=>{
-          const data = []
-          for(let i= 0; i<=res.length-1; i++){
-            data.push({path:res[i],selected:false})
-          }
-          arr = data
-          return arr
-        }) 
-      },
-      error:()=>{
-        alert('No sub directory found')
+        if(res){
+          this.missingCasses.update((arr)=>{
+            const newArr = arr.filter((r)=> r.id!=id)
+            return newArr
+          })
+        }else{
+          alert('failed ')
+        }
       }
     })
-  }
-  nav(name?:string){
-    this.searchQuery = ''
-    this.http.post<string[]>('/path/',name? [...this.paths,name]: this.paths).subscribe({
-      next:(res)=>{
-        this.currentDirList.update((arr)=>{
-          const data = []
-          for(let i= 0; i<=res.length-1; i++){
-            data.push({path:res[i],selected:false})
-          }
-          arr = data
-          return arr
-        }) 
-        if(name)this.paths.push(name)
-      },
-      error:()=>{
-        alert('No sub directory found')
-      }
-    })
-  }
-
-  backDir(){
-    this.paths.pop()
-    this.nav()
-  }
-
-  searchQuery: string = "";
-
-  filteredList(): {path:string,selected:boolean}[] {
-    if (!this.searchQuery) return this.currentDirList();
-
-    try {
-      const regex = new RegExp(this.searchQuery, "i"); // case-insensitive
-      return this.currentDirList().filter(item => regex.test(item.path));
-    } catch (e) {
-      // invalid regex → return full list or empty
-      return this.currentDirList();
-    }
-  }
-  newDir(str:string){
-    this.paths.length = 0;
-    this.paths[0] = str
-    this.nav()
   }
   copy(text: string) {
     navigator.clipboard.writeText(text)
