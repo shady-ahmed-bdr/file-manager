@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-
+import { sendToClient } from './websocket';
 
 
 const C = console.log
@@ -21,13 +21,14 @@ async function hasPdf(folder:string) {
 }
 
 const sameV:string[] = [];
-export async function syncFolder(src:string, dest:string,caseNum:string) {
+export async function syncFolder(src:string, dest:string,caseNum:string, single?:boolean) {
 	const base = path.basename(src);
 	const regex = new RegExp('old','gi')
 	const Reg0000 = new RegExp('0000', 'g')
 	if (Reg0000.test(base)) return; // ✅ Skip 0000 folders
 	if (regex.test(base)) return; // ✅ Skip OLD folders
 	C('Updating: ',src)
+	sendToClient({type:'transfer_log', state: 'Updating: '+src})
 	const stat = await fs.lstat(src);
 	const destExists = await fs.access(dest).then(() => true).catch(() => false);
 	if (!stat.isDirectory() && destExists) {
@@ -37,6 +38,7 @@ export async function syncFolder(src:string, dest:string,caseNum:string) {
 			return;
 		}
 		C('found a match', caseNum, src);
+		sendToClient({type:'transfer_log', state: 'found a match'+ caseNum + src})
 	}
 	if (stat.isDirectory()) {
 		await fs.mkdir(dest, { recursive: true });
@@ -56,10 +58,12 @@ export async function syncFolder(src:string, dest:string,caseNum:string) {
 						const to = path.join(dest, item.name);
 						await fs.copyFile(from, to);
 						C(`Copied missing PDF from: ${caseNum}`);
+						sendToClient({type:'transfer_log', state: `Copied missing PDF from: ${caseNum}`})
 					}
 				}
 			} catch (err) {
 				console.warn(`No OLD folder or PDF inside for: ${src}`);
+				sendToClient({type:'transfer_log', state: `No OLD folder or PDF inside for: ${src}`})
 			}
 		}
 	} else {
@@ -67,6 +71,7 @@ export async function syncFolder(src:string, dest:string,caseNum:string) {
 			await fs.copyFile(src, dest);
 		} catch (err) {
 			console.warn(`Failed to copy ${src} → ${dest}:`, err);
+			sendToClient({type:'transfer_log', state: `Failed to copy ${src} → ${dest}:`})
 		}
 	}
 }
@@ -78,6 +83,7 @@ export async function updateProtocol(cases:string[],originalRoot:string, modifie
 	let notFound = [];
 	for (const item of items) {
 		C(cases, 'on Patch:', item,' (', len,'/',total,')');
+		sendToClient({type:'transfer_log', state: cases+ 'on Patch:'+ item+' ('+ len+'/'+total+')'})
 		notFound = [];
 		for (const caseNum of cases) {
 
@@ -90,16 +96,20 @@ export async function updateProtocol(cases:string[],originalRoot:string, modifie
 
 			if (!caseTarget || !destCaseTarget) {
 				console.warn(`Skipping case ${caseNum} → source or destination not found on patch ${item}.`);
-				notFound.push(caseNum);
+				sendToClient({type:'transfer_log', state: `Skipping case ${caseNum} → source or destination not found on patch ${item}.`})
+				notFound.push({dest: destCaseTarget || '', src: caseTarget || '', id: caseNum, state:'red', type:'transfer_status_case'});
 			}else{
 				C()
+				sendToClient({type:'transfer_log', state: ' '})
 				C(`Syncing case ${caseNum}... on Patch: ${item}`);
+				sendToClient({type:'transfer_log', state: `Syncing case ${caseNum}... on Patch: ${item}`})
 				await syncFolder(srcFolder, destFolder,caseNum);
 			}
 		}
 		
 		if(total == len) {
 			C(notFound,'- not found', sameV, ' - same files with no updates')
+			notFound.forEach((r)=> sendToClient(r))
 			const __filename = fileURLToPath(import.meta.url);
     		const __dirname = dirname(__filename);
 			const date = new Date().toISOString().replace(/[:]/g, '-'); // e.g., "2025-07-25T13-35-27.000Z"
@@ -108,8 +118,8 @@ export async function updateProtocol(cases:string[],originalRoot:string, modifie
 			fs.writeFile(loc,'not found: ' +notFound.toString().replaceAll(',','\n')+'\n'+'same file with no updates: '+ sameV.toString().replaceAll(',','\n'))
 			return notFound
 		}
-		cases = notFound;
-		notFound = []
+		cases = notFound.map((arr)=>arr.id);
+		notFound = [];
 		len++;
 		C()
 	}

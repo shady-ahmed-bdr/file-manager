@@ -40,11 +40,22 @@ export class Update {
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      if(type == 'src'){
-        obj.src = result;
-      }else{
-        obj.dest = result;
-      }
+      this.missingCasses.update((arr)=>{
+        arr = arr.map((C)=>{
+          if(C.id == MC.id){
+            if(type == 'src'){
+              obj.src = result;
+              C.src = result;
+            }else{
+              obj.dest = result;
+              C.dest = result;
+            }
+          }
+          return C
+        })
+        return arr
+      })
+      
       console.log(obj,'uuu')
       if(result) this.updateSingleCase(obj.id,obj.src,obj.dest)
     });
@@ -62,7 +73,7 @@ export class Update {
     return cases
   }
   missingCasses = signal<MC[]>([
-    {dest: '', src:'dasda', id:';54654', state:'yellow'}
+    {dest: '', src:'', id:';54654', state:'yellow'}
   ])
 
   
@@ -84,6 +95,9 @@ export class Update {
           arr.push(msg as any)
           return arr
         })
+      }
+      if(msg && msg.type == 'transfer_log'){
+        this.messages.unshift(msg.state)
       }
     })
     
