@@ -70,3 +70,13 @@ export interface HandleResult {
   action?: string;
   message?: string;
 }
+
+export interface updateSocket {
+  type:'transfer_status' | 'transfer_status_case' | 'transfer_log'
+  id:string;
+  state:'red'| 'yellow'| 'green'
+}
+export interface updateSocketCase extends updateSocket {
+  src:string;
+  dest:string, 
+}

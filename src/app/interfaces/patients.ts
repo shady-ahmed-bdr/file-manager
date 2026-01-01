@@ -44,7 +44,7 @@ export interface TransferSocket {
     type:'transfer_status'
 }
 export interface updateSocket {
-    type:'transfer_status' | 'transfer_status_case'
+    type:'transfer_status' | 'transfer_status_case' | 'transfer_log'
     id:string;
     state:'red'| 'yellow'| 'green'
 }

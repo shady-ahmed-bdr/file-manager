@@ -40,11 +40,22 @@ export class Update {
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      if(type == 'src'){
-        obj.src = result;
-      }else{
-        obj.dest = result;
-      }
+      this.missingCasses.update((arr)=>{
+        arr = arr.map((C)=>{
+          if(C.id == MC.id){
+            if(type == 'src'){
+              obj.src = result;
+              C.src = result;
+            }else{
+              obj.dest = result;
+              C.dest = result;
+            }
+          }
+          return C
+        })
+        return arr
+      })
+      
       console.log(obj,'uuu')
       if(result) this.updateSingleCase(obj.id,obj.src,obj.dest)
     });
@@ -62,7 +73,7 @@ export class Update {
     return cases
   }
   missingCasses = signal<MC[]>([
-    {dest: '', src:'dasda', id:';54654', state:'yellow'}
+    {dest: '', src:'', id:';54654', state:'yellow'}
   ])
 
   
@@ -85,6 +96,9 @@ export class Update {
           return arr
         })
       }
+      if(msg && msg.type == 'transfer_log'){
+        this.messages.unshift(msg.state)
+      }
     })
     
     const savedSettings = localStorage.getItem('appSettings');
@@ -93,7 +107,7 @@ export class Update {
     }
   }
   updateSingleCase(id:string, src: string, dest:string){
-    this.http.post<boolean>('/update_cases_item', {id, src, dest}).subscribe({
+    if(src&&dest) this.http.post<boolean>('/update_cases_item', {id, src, dest}).subscribe({
       next:(res)=>{
         if(res){
           this.missingCasses.update((arr)=>{
